@@ -9,7 +9,7 @@ InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
     borderSide: BorderSide(color: Colors.grey),
   ),
   focusedBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(100),
+    borderRadius: BorderRadius.circular(20),
     borderSide: BorderSide(color: Constants.colors.primary),
   ),
   errorBorder: OutlineInputBorder(
@@ -17,7 +17,7 @@ InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
     borderSide: BorderSide(color: Constants.colors.error),
   ),
   focusedErrorBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(100),
+    borderRadius: BorderRadius.circular(20),
     borderSide: BorderSide(color: Constants.colors.error),
   ),
 );

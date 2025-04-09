@@ -5,8 +5,10 @@ import 'package:placeholder_app/core/themes/text_form_field_theme.dart';
 import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/views/choose_user.dart';
 import 'package:placeholder_app/features/auth/views/login.dart';
-import 'package:placeholder_app/usecases/init_supabase.dart';
+import 'package:placeholder_app/core/usecases/init_supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'features/tasks/cubit/task_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,8 +16,11 @@ void main() async {
 
   await initSupabase();
 
-  runApp(BlocProvider(
-    create: (context) => AuthCubit(),
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (context) => AuthCubit()),
+      BlocProvider(create: (context) => TaskCubit()),
+    ],
     child: const MainApp(),
   ));
 }

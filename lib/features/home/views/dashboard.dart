@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder_app/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder_app/features/home/widgets/user_list.dart';
-import 'package:placeholder_app/usecases/snack.dart';
+import 'package:placeholder_app/core/usecases/snack.dart';
 
 import '../../auth/cubit/auth_cubit.dart';
 import '../../auth/models/p_h_user.dart';

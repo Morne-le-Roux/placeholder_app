@@ -5,8 +5,8 @@ import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/models/p_h_user.dart';
 import 'package:placeholder_app/features/auth/widgets/user_selector.dart';
 import 'package:placeholder_app/features/home/views/dashboard.dart';
-import 'package:placeholder_app/usecases/nav.dart';
-import 'package:placeholder_app/usecases/snack.dart';
+import 'package:placeholder_app/core/usecases/nav.dart';
+import 'package:placeholder_app/core/usecases/snack.dart';
 
 import '../usecases/create_new_user.dart';
 

@@ -6,9 +6,8 @@ import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/usecases/validate_email.dart';
 import 'package:placeholder_app/features/auth/usecases/validate_password.dart';
 import 'package:placeholder_app/features/auth/views/choose_user.dart';
-import 'package:placeholder_app/features/home/views/dashboard.dart';
-import 'package:placeholder_app/usecases/nav.dart';
-import 'package:placeholder_app/usecases/snack.dart';
+import 'package:placeholder_app/core/usecases/nav.dart';
+import 'package:placeholder_app/core/usecases/snack.dart';
 
 import '../../../core/constants/constants.dart';
 

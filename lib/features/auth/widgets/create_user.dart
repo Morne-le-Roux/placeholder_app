@@ -4,8 +4,8 @@ import 'package:gap/gap.dart';
 import 'package:placeholder_app/core/widgets/buttons/large_rounded_button.dart';
 import 'package:placeholder_app/features/auth/models/p_h_user.dart';
 import 'package:placeholder_app/main.dart';
-import 'package:placeholder_app/usecases/nav.dart';
-import 'package:placeholder_app/usecases/snack.dart';
+import 'package:placeholder_app/core/usecases/nav.dart';
+import 'package:placeholder_app/core/usecases/snack.dart';
 import 'package:uuid/uuid.dart';
 
 import '../cubit/auth_cubit.dart';
@@ -30,7 +30,7 @@ class _CreateUserState extends State<CreateUser> {
         name: "",
         avatarURL: null,
         isDashboard: false,
-        accountHolderId: supabaseClient.auth.currentUser?.id ?? "");
+        accountHolderID: supabaseClient.auth.currentUser?.id ?? "");
     super.initState();
   }
 
