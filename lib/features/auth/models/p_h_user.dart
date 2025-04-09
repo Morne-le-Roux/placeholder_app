@@ -32,4 +32,20 @@ class PHUser {
         isDashboard: map['is_dashboard'] as bool,
         accountHolderId: map['account_holder_id']);
   }
+
+  PHUser copyWith({
+    String? id,
+    String? name,
+    String? avatarURL,
+    bool? isDashboard,
+    String? accountHolderId,
+  }) {
+    return PHUser(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      avatarURL: avatarURL ?? this.avatarURL,
+      isDashboard: isDashboard ?? this.isDashboard,
+      accountHolderId: accountHolderId ?? this.accountHolderId,
+    );
+  }
 }

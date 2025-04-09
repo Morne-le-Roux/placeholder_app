@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder_app/core/widgets/loaders/main_loader.dart';
@@ -7,6 +5,8 @@ import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/models/p_h_user.dart';
 import 'package:placeholder_app/features/auth/widgets/user_selector.dart';
 import 'package:placeholder_app/usecases/snack.dart';
+
+import '../usecases/create_new_user.dart';
 
 class ChooseUser extends StatefulWidget {
   const ChooseUser({super.key});
@@ -17,6 +17,7 @@ class ChooseUser extends StatefulWidget {
 
 class _ChooseUserState extends State<ChooseUser> {
   AuthCubit get authCubit => context.read<AuthCubit>();
+  ScrollController scrollController = ScrollController();
 
   bool loadingUsers = false;
   List<PHUser> phUsers = [];
@@ -25,6 +26,12 @@ class _ChooseUserState extends State<ChooseUser> {
   void initState() {
     init();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   init() async {
@@ -67,7 +74,10 @@ class _ChooseUserState extends State<ChooseUser> {
                     ),
                   ),
                   UserSelector(
-                    onTap: () {},
+                    onTap: () async {
+                      await createNewUser(context);
+                      init();
+                    },
                   ),
                 ],
               ),

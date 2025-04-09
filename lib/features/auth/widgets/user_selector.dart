@@ -23,8 +23,8 @@ class UserSelector extends StatelessWidget {
             width: 200,
             child: FittedBox(
                 child: Icon(
-              Icons.person_rounded,
-              color: Colors.grey,
+              user != null ? Icons.person_rounded : Icons.add_rounded,
+              color: Colors.grey.shade400,
             )),
           ),
           Gap(20),

@@ -44,4 +44,12 @@ class AuthCubit extends Cubit<AuthState> {
   void setPHUser(PHUser phUser) {
     emit(state.copyWith(phUser: phUser));
   }
+
+  Future<void> createUser(PHUser phUser) async {
+    try {
+      await supabaseClient.from('users').insert(phUser.toMap());
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
