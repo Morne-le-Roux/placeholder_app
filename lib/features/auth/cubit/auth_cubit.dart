@@ -2,10 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder_app/main.dart';
 
+import '../models/p_h_user.dart';
+
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthInitial());
+  AuthCubit() : super(AuthState());
 
   Future<void> login(String email, String password) async {
     try {
@@ -23,5 +25,23 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<List<PHUser>> fetchUsers() async {
+    try {
+      List<PHUser> phUsers = [];
+      final response = await supabaseClient.from("users").select();
+      for (var phuMap in response) {
+        phUsers.add(PHUser.fromMap(phuMap));
+      }
+      // response.map((phUserMap) => phUsers.add(PHUser.fromMap(phUserMap)));
+      return phUsers;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  void setPHUser(PHUser phUser) {
+    emit(state.copyWith(phUser: phUser));
   }
 }

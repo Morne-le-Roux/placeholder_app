@@ -5,6 +5,7 @@ import 'package:placeholder_app/core/widgets/buttons/large_rounded_button.dart';
 import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/usecases/validate_email.dart';
 import 'package:placeholder_app/features/auth/usecases/validate_password.dart';
+import 'package:placeholder_app/features/auth/views/choose_user.dart';
 import 'package:placeholder_app/features/home/homescreen.dart';
 import 'package:placeholder_app/usecases/nav.dart';
 import 'package:placeholder_app/usecases/snack.dart';
@@ -127,7 +128,7 @@ class _LoginState extends State<Login> {
                         await authCubit.login(_email, _password);
                       }
                       setState(() => _isLoading = false);
-                      Nav.pushAndPop(context, const HomeScreen());
+                      Nav.pushAndPop(context, ChooseUser());
                     } catch (e) {
                       snack(context, e.toString());
                       setState(() => _isLoading = false);
