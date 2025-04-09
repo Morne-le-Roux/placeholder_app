@@ -19,8 +19,8 @@ class UserSelector extends StatelessWidget {
             padding: user?.avatarURL == null ? EdgeInsets.all(20) : null,
             decoration: BoxDecoration(
                 color: Colors.grey.shade300, shape: BoxShape.circle),
-            height: 200,
-            width: 200,
+            height: 100,
+            width: 100,
             child: FittedBox(
                 child: Icon(
               user != null ? Icons.person_rounded : Icons.add_rounded,
@@ -30,7 +30,7 @@ class UserSelector extends StatelessWidget {
           Gap(20),
           Text(
             user?.name ?? "Add A User",
-            style: Constants.textStyles.title,
+            style: Constants.textStyles.title2,
           )
         ],
       ),

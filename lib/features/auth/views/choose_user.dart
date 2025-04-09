@@ -4,6 +4,8 @@ import 'package:placeholder_app/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/models/p_h_user.dart';
 import 'package:placeholder_app/features/auth/widgets/user_selector.dart';
+import 'package:placeholder_app/features/home/views/dashboard.dart';
+import 'package:placeholder_app/usecases/nav.dart';
 import 'package:placeholder_app/usecases/snack.dart';
 
 import '../usecases/create_new_user.dart';
@@ -70,6 +72,9 @@ class _ChooseUserState extends State<ChooseUser> {
                       user: phu,
                       onTap: () {
                         authCubit.setPHUser(phu);
+                        if (authCubit.state.phUser != null) {
+                          Nav.push(context, Dashboard());
+                        }
                       },
                     ),
                   ),
