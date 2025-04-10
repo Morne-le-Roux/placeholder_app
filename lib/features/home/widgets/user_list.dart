@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:placeholder_app/core/widgets/avatar.dart';
 import 'package:placeholder_app/features/auth/models/p_h_user.dart';
+import 'package:placeholder_app/features/tasks/widgets/task_card.dart';
 
 import '../../../core/usecases/snack.dart';
 import '../../../core/widgets/loaders/main_loader.dart';
@@ -61,7 +62,7 @@ class _UserListState extends State<UserList> {
                   Text(widget.user.name),
                 ],
               ),
-              ...tasks.map((task) => Text(task.title))
+              ...tasks.map((task) => TaskCard(task: task))
             ],
           ),
         ),

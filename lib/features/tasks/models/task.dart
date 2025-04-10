@@ -7,6 +7,7 @@ class Task {
     required this.content,
     required this.recurring,
     required this.createdAt,
+    required this.authorId,
     this.lastDone,
   });
   final String id;
@@ -17,6 +18,7 @@ class Task {
   final bool recurring;
   final String createdAt;
   final String? lastDone;
+  final String authorId;
 
   Map<String, dynamic> toMap() {
     return {
@@ -28,20 +30,21 @@ class Task {
       'recurring': recurring,
       'created_at': createdAt,
       'last_done': lastDone,
+      'author_id': authorId,
     };
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
-      id: map['id'] as String,
-      userId: map['user_id'] as String,
-      accountHolderId: map['account_holder_id'] as String,
-      title: map['title'] as String,
-      content: map['content'] as String,
-      recurring: map['recurring'] == null ? false : map['recurring'] as bool,
-      createdAt: map['created_at'] as String,
-      lastDone: map['last_done'] as String?,
-    );
+        id: map['id'] as String,
+        userId: map['user_id'] as String,
+        accountHolderId: map['account_holder_id'] as String,
+        title: map['title'] as String,
+        content: map['content'] as String,
+        recurring: map['recurring'] == null ? false : map['recurring'] as bool,
+        createdAt: map['created_at'] as String,
+        lastDone: map['last_done'] as String?,
+        authorId: map["author_id"] as String);
   }
 
   Task copyWith({
@@ -53,6 +56,7 @@ class Task {
     bool? recurring,
     String? createdAt,
     String? lastDone,
+    String? authorId,
   }) {
     return Task(
       id: id ?? this.id,
@@ -63,6 +67,7 @@ class Task {
       recurring: recurring ?? this.recurring,
       createdAt: createdAt ?? this.createdAt,
       lastDone: lastDone ?? this.lastDone,
+      authorId: authorId ?? this.authorId,
     );
   }
 }

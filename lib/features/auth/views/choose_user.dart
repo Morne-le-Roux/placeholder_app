@@ -63,28 +63,31 @@ class _ChooseUserState extends State<ChooseUser> {
       body: Center(
         child: loadingUsers
             ? MainLoader()
-            : Wrap(
-                spacing: 40,
-                alignment: WrapAlignment.center,
-                children: [
-                  ...phUsers.map(
-                    (phu) => UserSelector(
-                      user: phu,
-                      onTap: () {
-                        authCubit.setPHUser(phu);
-                        if (authCubit.state.phUser != null) {
-                          Nav.push(context, Dashboard());
-                        }
+            : Padding(
+                padding: EdgeInsets.all(10),
+                child: Wrap(
+                  spacing: 40,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    ...phUsers.map(
+                      (phu) => UserSelector(
+                        user: phu,
+                        onTap: () {
+                          authCubit.setPHUser(phu);
+                          if (authCubit.state.phUser != null) {
+                            Nav.push(context, Dashboard());
+                          }
+                        },
+                      ),
+                    ),
+                    UserSelector(
+                      onTap: () async {
+                        await createNewUser(context);
+                        init();
                       },
                     ),
-                  ),
-                  UserSelector(
-                    onTap: () async {
-                      await createNewUser(context);
-                      init();
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
       ),
     );

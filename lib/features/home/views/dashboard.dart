@@ -16,6 +16,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   AuthCubit get authCubit => context.read<AuthCubit>();
+  bool get isDashboard => authCubit.state.phUser?.isDashboard ?? false;
   List<PHUser> users = [];
   bool isLoading = false;
 
@@ -48,10 +49,13 @@ class _DashboardState extends State<Dashboard> {
               width: MediaQuery.of(context).size.width,
               child: SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  child: Row(
-                      children: users
-                          .map((user) => Expanded(child: UserList(user: user)))
-                          .toList())),
+                  child: isDashboard
+                      ? Row(
+                          children: users
+                              .map((user) =>
+                                  Expanded(child: UserList(user: user)))
+                              .toList())
+                      : UserList(user: authCubit.state.phUser!)),
             ),
     );
   }

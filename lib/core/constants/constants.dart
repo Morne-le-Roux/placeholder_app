@@ -22,4 +22,6 @@ class _TextStyles {
       const TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
   final TextStyle title2 =
       const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
+  final TextStyle title3 =
+      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
 }

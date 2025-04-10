@@ -33,6 +33,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
     task = Task(
       id: Uuid().v4(),
       userId: widget.phUser.id,
+      authorId: authCubit.state.phUser?.id ?? "",
       accountHolderId: supabaseClient.auth.currentUser?.id ?? "",
       title: "",
       content: "",
