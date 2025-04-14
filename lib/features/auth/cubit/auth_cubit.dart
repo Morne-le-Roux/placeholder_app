@@ -30,7 +30,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<List<PHUser>> fetchUsers() async {
     try {
       List<PHUser> phUsers = [];
-      final response = await supabaseClient.from("users").select();
+      final response = await supabaseClient.from("ph_users").select();
       for (var phuMap in response) {
         phUsers.add(PHUser.fromMap(phuMap));
       }
@@ -47,7 +47,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> createUser(PHUser phUser) async {
     try {
-      await supabaseClient.from('users').insert(phUser.toMap());
+      await supabaseClient.from('ph_users').insert(phUser.toMap());
     } catch (e) {
       rethrow;
     }

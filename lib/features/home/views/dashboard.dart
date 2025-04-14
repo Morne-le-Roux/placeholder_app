@@ -49,32 +49,21 @@ class _DashboardState extends State<Dashboard> {
       ),
       body: isLoading
           ? Center(child: MainLoader())
-          : isPortrait(context)
-              ? _UserDash()
-              : Container(
-                  alignment: Alignment.center,
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: isDashboard
-                        ? Row(
-                            children: users
-                                .map((user) =>
-                                    Expanded(child: UserList(user: user)))
-                                .toList())
-                        : UserList(user: authCubit.state.phUser!),
-                  ),
-                ),
+          : Container(
+              alignment: Alignment.center,
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: isDashboard
+                    ? Row(
+                        children: users
+                            .map(
+                                (user) => Expanded(child: UserList(user: user)))
+                            .toList())
+                    : UserList(user: authCubit.state.phUser!),
+              ),
+            ),
     );
-  }
-}
-
-class _UserDash extends StatelessWidget {
-  const _UserDash();
-
-  @override
-  Widget build(BuildContext context) {
-    return UserList(user: context.read<AuthCubit>().state.phUser!);
   }
 }

@@ -28,6 +28,8 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   TaskCubit get taskCubit => context.read<TaskCubit>();
   AuthCubit get authCubit => context.read<AuthCubit>();
+  bool get isDashboard => authCubit.state.phUser?.isDashboard ?? false;
+
   bool isLoading = false;
 
   List<Task> tasks = [];
@@ -74,7 +76,7 @@ class _UserListState extends State<UserList> {
               child: Column(
                 children: [
                   InkWell(
-                    onTap: isPortrait(context)
+                    onTap: !isDashboard
                         ? () {
                             setState(() {
                               int currentIndex = authCubit.state.phUsers
