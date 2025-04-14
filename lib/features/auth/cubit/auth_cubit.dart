@@ -34,7 +34,7 @@ class AuthCubit extends Cubit<AuthState> {
       for (var phuMap in response) {
         phUsers.add(PHUser.fromMap(phuMap));
       }
-      // response.map((phUserMap) => phUsers.add(PHUser.fromMap(phUserMap)));
+      emit(state.copyWith(phUsers: phUsers));
       return phUsers;
     } catch (e) {
       rethrow;

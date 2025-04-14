@@ -41,6 +41,11 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Today"),
+        actions: [Text("User: ${authCubit.state.phUser?.name}  ")],
+        automaticallyImplyLeading: false,
+      ),
       body: isLoading
           ? Center(child: MainLoader())
           : Container(

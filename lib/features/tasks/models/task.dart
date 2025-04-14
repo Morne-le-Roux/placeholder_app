@@ -18,7 +18,7 @@ class Task {
   final bool recurring;
   final String createdAt;
   final String? lastDone;
-  final String authorId;
+  final String? authorId;
 
   Map<String, dynamic> toMap() {
     return {
@@ -44,7 +44,7 @@ class Task {
         recurring: map['recurring'] == null ? false : map['recurring'] as bool,
         createdAt: map['created_at'] as String,
         lastDone: map['last_done'] as String?,
-        authorId: map["author_id"] as String);
+        authorId: map["author_id"] as String?);
   }
 
   Task copyWith({

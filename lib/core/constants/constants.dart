@@ -24,4 +24,11 @@ class _TextStyles {
       const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
   final TextStyle title3 =
       const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle description = const TextStyle(
+    fontSize: 14,
+    color: Colors.grey,
+  );
+
+  final TextStyle data = const TextStyle(
+      fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic);
 }
