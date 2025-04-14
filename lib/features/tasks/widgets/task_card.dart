@@ -29,7 +29,15 @@ class TaskCard extends StatelessWidget {
         margin: EdgeInsets.all(4),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                  blurRadius: 3,
+                  color: Colors.black12,
+                  spreadRadius: 1,
+                  offset: Offset(2, 2))
+            ]),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -43,9 +51,21 @@ class TaskCard extends StatelessWidget {
                 style: Constants.textStyles.description,
               ),
             Gap(20),
-            Text(
-              "By: ${userNameFromID(context, userId: task.authorId)}",
-              style: Constants.textStyles.data,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "By: ${userNameFromID(context, userId: task.authorId)}",
+                  style: Constants.textStyles.data,
+                ),
+                if (task.recurring)
+                  Text(
+                    "Recurring",
+                    style: Constants.textStyles.data.copyWith(
+                      color: Colors.green,
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
@@ -55,7 +75,7 @@ class TaskCard extends StatelessWidget {
 }
 
 class _DeleteIcon extends StatelessWidget {
-  const _DeleteIcon({super.key});
+  const _DeleteIcon();
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +87,16 @@ class _DeleteIcon extends StatelessWidget {
         color: Colors.deepOrangeAccent,
         borderRadius: BorderRadius.circular(20),
       ),
+      child: Icon(
+        Icons.delete,
+        color: Colors.white,
+      ),
     );
   }
 }
 
 class _CompleteIcon extends StatelessWidget {
-  const _CompleteIcon({super.key});
+  const _CompleteIcon();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +106,10 @@ class _CompleteIcon extends StatelessWidget {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20), color: Colors.blue),
-      child: Icon(Icons.check),
+      child: Icon(
+        Icons.check,
+        color: Colors.white,
+      ),
     );
   }
 }

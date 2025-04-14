@@ -37,7 +37,7 @@ class _UserListState extends State<UserList> {
   Future<void> init({bool showLoader = false}) async {
     try {
       setState(() => isLoading = showLoader);
-      tasks = await taskCubit.fetchTasks(widget.user.id);
+      tasks = await taskCubit.fetchTasks(user.id);
       tasks.removeWhere((task) => isTaskDoneToday(task));
       setState(() => isLoading = false);
     } catch (e) {
@@ -57,17 +57,18 @@ class _UserListState extends State<UserList> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          height: MediaQuery.of(context).size.height,
-          constraints: BoxConstraints(minWidth: 100),
-          padding: EdgeInsets.only(top: 10, right: 10, left: 10),
-          decoration: BoxDecoration(
-              border:
-                  Border(right: BorderSide(width: 0.5, color: Colors.grey))),
-          child: RefreshIndicator(
-            onRefresh: () async {
-              await init(showLoader: tasks.isEmpty);
-            },
+        RefreshIndicator(
+          onRefresh: () async {
+            await init(showLoader: false);
+          },
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            constraints: BoxConstraints(minWidth: 100),
+            padding: EdgeInsets.only(top: 10, right: 5, left: 5),
+            decoration: BoxDecoration(
+                border: Border(
+                    right:
+                        BorderSide(width: 0.5, color: Colors.grey.shade300))),
             child: SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -87,15 +88,29 @@ class _UserListState extends State<UserList> {
                             });
                           }
                         : null,
-                    child: Row(
-                      children: [
-                        Avatar(url: user.avatarURL),
-                        Gap(10),
-                        Text(user.name),
-                        Gap(10),
-                        if (isPortrait(context))
-                          Icon(Icons.keyboard_arrow_right_rounded),
-                      ],
+                    child: Container(
+                      margin: EdgeInsets.all(4),
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 2,
+                                color: Colors.black12,
+                                spreadRadius: 1,
+                                offset: Offset(2, 2))
+                          ]),
+                      child: Row(
+                        children: [
+                          Avatar(url: user.avatarURL),
+                          Gap(10),
+                          Text(user.name),
+                          Gap(10),
+                          if (isPortrait(context))
+                            Icon(Icons.keyboard_arrow_right_rounded),
+                        ],
+                      ),
                     ),
                   ),
                   Gap(10),

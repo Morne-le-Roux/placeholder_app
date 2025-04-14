@@ -68,7 +68,8 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
             ),
             Gap(20),
             TextFormField(
-              decoration: InputDecoration(labelText: "Description"),
+              decoration: InputDecoration(
+                  labelText: "Description", alignLabelWithHint: true),
               initialValue: task.content,
               maxLines: 5,
               onChanged: (value) =>

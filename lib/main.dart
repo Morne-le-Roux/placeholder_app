@@ -33,7 +33,11 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(inputDecorationTheme: inputDecorationTheme),
+      theme: ThemeData(
+          inputDecorationTheme: inputDecorationTheme,
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: AppBarTheme(
+              color: Colors.white, surfaceTintColor: Colors.transparent)),
       home: supabaseClient.auth.currentSession != null ? ChooseUser() : Login(),
     );
   }
