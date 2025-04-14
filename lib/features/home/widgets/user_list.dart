@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:placeholder_app/core/usecases/is_portrait.dart';
 import 'package:placeholder_app/core/widgets/avatar.dart';
+import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder_app/features/auth/models/p_h_user.dart';
 import 'package:placeholder_app/features/tasks/usecases/is_task_done_today.dart';
 import 'package:placeholder_app/features/tasks/widgets/task_card.dart';
@@ -25,9 +27,12 @@ class UserList extends StatefulWidget {
 
 class _UserListState extends State<UserList> {
   TaskCubit get taskCubit => context.read<TaskCubit>();
+  AuthCubit get authCubit => context.read<AuthCubit>();
   bool isLoading = false;
 
   List<Task> tasks = [];
+
+  late PHUser user;
 
   Future<void> init({bool showLoader = false}) async {
     try {
@@ -43,6 +48,7 @@ class _UserListState extends State<UserList> {
 
   @override
   void initState() {
+    user = widget.user;
     init(showLoader: true);
     super.initState();
   }
@@ -66,12 +72,31 @@ class _UserListState extends State<UserList> {
               physics: AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Avatar(url: widget.user.avatarURL),
-                      Gap(10),
-                      Text(widget.user.name),
-                    ],
+                  InkWell(
+                    onTap: isPortrait(context)
+                        ? () {
+                            setState(() {
+                              int currentIndex = authCubit.state.phUsers
+                                  .indexWhere((u) => u.id == user.id);
+                              int nextIndex = (currentIndex + 1) >=
+                                      authCubit.state.phUsers.length
+                                  ? 0
+                                  : currentIndex + 1;
+                              user = authCubit.state.phUsers[nextIndex];
+                              init(showLoader: true);
+                            });
+                          }
+                        : null,
+                    child: Row(
+                      children: [
+                        Avatar(url: user.avatarURL),
+                        Gap(10),
+                        Text(user.name),
+                        Gap(10),
+                        if (isPortrait(context))
+                          Icon(Icons.keyboard_arrow_right_rounded),
+                      ],
+                    ),
                   ),
                   Gap(10),
                   ...tasks.map(
@@ -105,11 +130,11 @@ class _UserListState extends State<UserList> {
           bottom: 20,
           right: 10,
           child: FloatingActionButton.small(
-            heroTag: "add_user_${widget.user.id}",
+            heroTag: "add_user_${user.id}",
             elevation: 2,
             child: Icon(Icons.add_rounded),
             onPressed: () async {
-              await createTask(context, widget.user);
+              await createTask(context, user);
               await init(showLoader: tasks.isEmpty);
             },
           ),

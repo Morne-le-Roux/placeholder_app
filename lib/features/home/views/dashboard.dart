@@ -4,6 +4,7 @@ import 'package:placeholder_app/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder_app/features/home/widgets/user_list.dart';
 import 'package:placeholder_app/core/usecases/snack.dart';
 
+import '../../../core/usecases/is_portrait.dart';
 import '../../auth/cubit/auth_cubit.dart';
 import '../../auth/models/p_h_user.dart';
 
@@ -48,20 +49,32 @@ class _DashboardState extends State<Dashboard> {
       ),
       body: isLoading
           ? Center(child: MainLoader())
-          : Container(
-              alignment: Alignment.center,
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: SizedBox(
+          : isPortrait(context)
+              ? _UserDash()
+              : Container(
+                  alignment: Alignment.center,
+                  height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
-                  child: isDashboard
-                      ? Row(
-                          children: users
-                              .map((user) =>
-                                  Expanded(child: UserList(user: user)))
-                              .toList())
-                      : UserList(user: authCubit.state.phUser!)),
-            ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: isDashboard
+                        ? Row(
+                            children: users
+                                .map((user) =>
+                                    Expanded(child: UserList(user: user)))
+                                .toList())
+                        : UserList(user: authCubit.state.phUser!),
+                  ),
+                ),
     );
+  }
+}
+
+class _UserDash extends StatelessWidget {
+  const _UserDash();
+
+  @override
+  Widget build(BuildContext context) {
+    return UserList(user: context.read<AuthCubit>().state.phUser!);
   }
 }
