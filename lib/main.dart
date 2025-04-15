@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,7 +13,15 @@ import 'features/tasks/cubit/task_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+
+  switch (kDebugMode) {
+    case true:
+      await dotenv.load(fileName: "staging.env");
+      break;
+    case false:
+      await dotenv.load(fileName: "prod.env");
+      break;
+  }
 
   await initSupabase();
 

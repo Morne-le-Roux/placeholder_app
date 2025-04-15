@@ -12,7 +12,9 @@
 .swiftpm/
 migrate_working_dir/
 
-.env
+staging.env
+prod.env
+
 
 
 # IntelliJ related
