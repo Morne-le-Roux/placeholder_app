@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:placeholder_app/core/constants/constants.dart';
+import 'package:placeholder/core/constants/constants.dart';
 
 import '../loaders/main_loader.dart';
 

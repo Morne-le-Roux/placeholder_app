@@ -1,15 +1,18 @@
 import 'dart:developer';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder_app/core/usecases/is_portrait.dart';
-import 'package:placeholder_app/core/widgets/avatar.dart';
-import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
-import 'package:placeholder_app/features/auth/models/p_h_user.dart';
-import 'package:placeholder_app/features/tasks/usecases/is_task_done_today.dart';
-import 'package:placeholder_app/features/tasks/widgets/task_card.dart';
+import 'package:placeholder/core/usecases/is_portrait.dart';
+import 'package:placeholder/core/widgets/avatar.dart';
+import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
+import 'package:placeholder/features/auth/models/p_h_user.dart';
+import 'package:placeholder/features/tasks/usecases/is_task_done_today.dart';
+import 'package:placeholder/features/tasks/widgets/task_card.dart';
 
+import '../../../core/constants/constants.dart';
+import '../../../core/usecases/is_dark_mode.dart';
 import '../../../core/usecases/snack.dart';
 import '../../../core/widgets/loaders/main_loader.dart';
 import '../../tasks/cubit/task_cubit.dart';
@@ -31,9 +34,8 @@ class _UserListState extends State<UserList> {
   bool get isDashboard => authCubit.state.phUser?.isDashboard ?? false;
 
   bool isLoading = false;
-
+  Timer? _refreshTimer;
   List<Task> tasks = [];
-
   late PHUser user;
 
   Future<void> init({bool showLoader = false}) async {
@@ -52,7 +54,18 @@ class _UserListState extends State<UserList> {
   void initState() {
     user = widget.user;
     init(showLoader: true);
+    if (isDashboard) {
+      _refreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+        init(showLoader: false);
+      });
+    }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -69,8 +82,11 @@ class _UserListState extends State<UserList> {
             padding: EdgeInsets.only(top: 10, right: 5, left: 5),
             decoration: BoxDecoration(
                 border: Border(
-                    right:
-                        BorderSide(width: 0.5, color: Colors.grey.shade300))),
+                    right: BorderSide(
+                        width: 0.5,
+                        color: isDarkMode(context)
+                            ? const Color.fromARGB(255, 36, 36, 36)
+                            : Colors.grey.shade300))),
             child: SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -94,23 +110,26 @@ class _UserListState extends State<UserList> {
                       margin: EdgeInsets.all(4),
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                                blurRadius: 2,
-                                color: Colors.black12,
-                                spreadRadius: 1,
-                                offset: Offset(2, 2))
-                          ]),
+                        color: isDarkMode(context)
+                            ? const Color.fromARGB(255, 39, 39, 39)
+                            : Constants.colors.headerColor,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Row(
                         children: [
                           Avatar(url: user.avatarURL),
                           Gap(10),
-                          Text(user.name),
+                          Text(user.name,
+                              style: Constants.textStyles.title3.copyWith(
+                                  color: isDarkMode(context)
+                                      ? const Color.fromARGB(255, 207, 207, 207)
+                                      : Colors.black)),
                           Gap(10),
-                          if (isPortrait(context))
-                            Icon(Icons.keyboard_arrow_right_rounded),
+                          if (!isDashboard)
+                            Icon(Icons.keyboard_arrow_right_rounded,
+                                color: isDarkMode(context)
+                                    ? const Color.fromARGB(255, 207, 207, 207)
+                                    : Colors.black),
                         ],
                       ),
                     ),
@@ -147,6 +166,12 @@ class _UserListState extends State<UserList> {
           bottom: 20,
           right: 10,
           child: FloatingActionButton.small(
+            backgroundColor: isDarkMode(context)
+                ? const Color.fromARGB(255, 39, 39, 39)
+                : Constants.colors.headerColor,
+            foregroundColor: isDarkMode(context)
+                ? const Color.fromARGB(255, 207, 207, 207)
+                : Colors.black,
             heroTag: "add_user_${user.id}",
             elevation: 2,
             child: Icon(Icons.add_rounded),

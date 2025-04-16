@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder_app/core/usecases/nav.dart';
-import 'package:placeholder_app/features/auth/models/p_h_user.dart';
+import 'package:placeholder/core/usecases/nav.dart';
+import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/constants/constants.dart';
+import '../../../core/usecases/is_dark_mode.dart';
 import '../../../core/usecases/snack.dart';
 import '../../../core/widgets/buttons/large_rounded_button.dart';
 import '../../../main.dart';
@@ -47,7 +49,9 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode(context)
+            ? const Color.fromARGB(255, 19, 19, 19)
+            : Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -57,19 +61,43 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            Text("Create Task for ${widget.phUser.name}"),
+            Text("Create Task for ${widget.phUser.name}",
+                style: Constants.textStyles.title3.copyWith(
+                    color: isDarkMode(context)
+                        ? const Color.fromARGB(255, 207, 207, 207)
+                        : Colors.black)),
             Gap(20),
             TextFormField(
+              textCapitalization: TextCapitalization.sentences,
+              style: Constants.textStyles.description.copyWith(
+                  color: isDarkMode(context)
+                      ? const Color.fromARGB(255, 207, 207, 207)
+                      : Colors.black),
               validator: (value) => value!.isEmpty ? "Title is required" : null,
-              decoration: InputDecoration(labelText: "Title"),
+              decoration: InputDecoration(
+                  labelText: "Title",
+                  labelStyle: Constants.textStyles.data.copyWith(
+                      color: isDarkMode(context)
+                          ? const Color.fromARGB(255, 207, 207, 207)
+                          : Colors.black)),
               initialValue: task.title,
               onChanged: (value) =>
                   setState(() => task = task.copyWith(title: value)),
             ),
             Gap(20),
             TextFormField(
+              textCapitalization: TextCapitalization.sentences,
+              style: Constants.textStyles.description.copyWith(
+                  color: isDarkMode(context)
+                      ? const Color.fromARGB(255, 207, 207, 207)
+                      : Colors.black),
               decoration: InputDecoration(
-                  labelText: "Description", alignLabelWithHint: true),
+                  labelText: "Description",
+                  alignLabelWithHint: true,
+                  labelStyle: Constants.textStyles.data.copyWith(
+                      color: isDarkMode(context)
+                          ? const Color.fromARGB(255, 207, 207, 207)
+                          : Colors.black)),
               initialValue: task.content,
               maxLines: 5,
               onChanged: (value) =>
@@ -79,7 +107,11 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Recurring"),
+                Text("Recurring (Daily)",
+                    style: Constants.textStyles.description.copyWith(
+                        color: isDarkMode(context)
+                            ? const Color.fromARGB(255, 207, 207, 207)
+                            : Colors.black)),
                 Switch(
                     value: task.recurring,
                     onChanged: (value) =>

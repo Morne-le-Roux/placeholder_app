@@ -13,6 +13,8 @@ class _Colors {
   final Color primary = const Color(0xFF2196F3);
   final Color secondary = const Color(0xFF03DAC6);
   final Color error = const Color(0xFFF44336);
+  final Color tasksColor = const Color.fromARGB(255, 252, 241, 210);
+  final Color headerColor = const Color.fromARGB(255, 241, 241, 241);
 }
 
 class _TextStyles {

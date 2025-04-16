@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder_app/core/widgets/buttons/large_rounded_button.dart';
-import 'package:placeholder_app/features/auth/cubit/auth_cubit.dart';
-import 'package:placeholder_app/features/auth/usecases/validate_email.dart';
-import 'package:placeholder_app/features/auth/usecases/validate_password.dart';
-import 'package:placeholder_app/features/auth/views/choose_user.dart';
-import 'package:placeholder_app/core/usecases/nav.dart';
-import 'package:placeholder_app/core/usecases/snack.dart';
+import 'package:placeholder/core/widgets/buttons/large_rounded_button.dart';
+import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
+import 'package:placeholder/features/auth/usecases/validate_email.dart';
+import 'package:placeholder/features/auth/usecases/validate_password.dart';
+import 'package:placeholder/features/auth/views/choose_user.dart';
+import 'package:placeholder/core/usecases/nav.dart';
+import 'package:placeholder/core/usecases/snack.dart';
 
 import '../../../core/constants/constants.dart';
 
@@ -64,11 +64,8 @@ class _LoginState extends State<Login> {
                     initialValue: _email,
                     validator: (value) {
                       String? error = validateEmail(value);
-                      if (error != null) {
-                        setState(() => _isValid = false);
-                      } else {
-                        setState(() => _isValid = true);
-                      }
+                      setState(() => _isValid = false);
+                      if (error == null) setState(() => _isValid = true);
                       return error;
                     },
                     onChanged: (value) => setState(() => _email = value),
@@ -78,13 +75,11 @@ class _LoginState extends State<Login> {
                 TextFormField(
                     autovalidateMode: AutovalidateMode.onUnfocus,
                     initialValue: _password,
+                    obscureText: true,
                     validator: (value) {
                       String? error = validatePassword(value);
-                      if (error != null) {
-                        setState(() => _isValid = false);
-                      } else {
-                        setState(() => _isValid = true);
-                      }
+                      setState(() => _isValid = false);
+                      if (error == null) setState(() => _isValid = true);
                       return error;
                     },
                     onChanged: (value) => setState(() => _password = value),
@@ -99,11 +94,17 @@ class _LoginState extends State<Login> {
                       ? TextFormField(
                           autovalidateMode: AutovalidateMode.onUnfocus,
                           initialValue: _password2,
-                          validator: (value) => value!.isEmpty
-                              ? "Password is required"
-                              : _password != _password2
-                                  ? "Passwords do not match"
-                                  : null,
+                          obscureText: true,
+                          validator: (value) {
+                            String? error = value!.isEmpty
+                                ? "Password is required"
+                                : _password != _password2
+                                    ? "Passwords do not match"
+                                    : null;
+                            setState(() => _isValid = false);
+                            if (error == null) setState(() => _isValid = true);
+                            return error;
+                          },
                           onChanged: (value) =>
                               setState(() => _password2 = value),
                           onEditingComplete: () =>

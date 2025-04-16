@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:placeholder_app/core/widgets/loaders/main_loader.dart';
-import 'package:placeholder_app/features/home/widgets/user_list.dart';
-import 'package:placeholder_app/core/usecases/snack.dart';
+import 'package:placeholder/core/usecases/nav.dart';
+import 'package:placeholder/core/widgets/loaders/main_loader.dart';
+import 'package:placeholder/features/home/widgets/user_list.dart';
+import 'package:placeholder/core/usecases/snack.dart';
 
+import '../../../core/constants/constants.dart';
+import '../../../core/usecases/is_dark_mode.dart';
 import '../../auth/cubit/auth_cubit.dart';
 import '../../auth/models/p_h_user.dart';
 
@@ -42,8 +45,19 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Today"),
-        actions: [Text("User: ${authCubit.state.phUser?.name}  ")],
+        title: Text("Today",
+            style: Constants.textStyles.title2.copyWith(
+                color: isDarkMode(context) ? Colors.white : Colors.black)),
+        actions: [
+          GestureDetector(
+            onTap: () => Nav.pop(context),
+            child: Text(
+              "User: ${authCubit.state.phUser?.name}    ",
+              style: Constants.textStyles.data.copyWith(
+                  color: isDarkMode(context) ? Colors.white : Colors.black),
+            ),
+          )
+        ],
         automaticallyImplyLeading: false,
       ),
       body: isLoading

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:placeholder_app/main.dart';
+import 'package:placeholder/main.dart';
 
 import '../models/p_h_user.dart';
 

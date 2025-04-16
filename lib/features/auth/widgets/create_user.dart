@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder_app/core/widgets/buttons/large_rounded_button.dart';
-import 'package:placeholder_app/features/auth/models/p_h_user.dart';
-import 'package:placeholder_app/main.dart';
-import 'package:placeholder_app/core/usecases/nav.dart';
-import 'package:placeholder_app/core/usecases/snack.dart';
+import 'package:placeholder/core/widgets/buttons/large_rounded_button.dart';
+import 'package:placeholder/features/auth/models/p_h_user.dart';
+import 'package:placeholder/main.dart';
+import 'package:placeholder/core/usecases/nav.dart';
+import 'package:placeholder/core/usecases/snack.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/constants/constants.dart';
+import '../../../core/usecases/is_dark_mode.dart';
 import '../cubit/auth_cubit.dart';
 
 class CreateUser extends StatefulWidget {
@@ -38,7 +40,9 @@ class _CreateUserState extends State<CreateUser> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode(context)
+              ? const Color.fromARGB(255, 19, 19, 19)
+              : Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       padding: EdgeInsets.all(20),
       child: Column(
@@ -46,14 +50,27 @@ class _CreateUserState extends State<CreateUser> {
         children: [
           TextFormField(
             initialValue: phUser.name,
+            style: Constants.textStyles.description.copyWith(
+                color: isDarkMode(context)
+                    ? const Color.fromARGB(255, 207, 207, 207)
+                    : Colors.black),
             onChanged: (value) =>
                 setState(() => phUser = phUser.copyWith(name: value)),
-            decoration: InputDecoration(label: Text("User Name")),
+            decoration: InputDecoration(
+                labelText: "User Name",
+                labelStyle: Constants.textStyles.data.copyWith(
+                    color: isDarkMode(context)
+                        ? const Color.fromARGB(255, 207, 207, 207)
+                        : Colors.black)),
           ),
           Gap(20),
           Row(
             children: [
-              Text("Dashboard"),
+              Text("Dashboard",
+                  style: Constants.textStyles.description.copyWith(
+                      color: isDarkMode(context)
+                          ? const Color.fromARGB(255, 207, 207, 207)
+                          : Colors.black)),
               Expanded(child: SizedBox()),
               Switch(
                   value: phUser.isDashboard,

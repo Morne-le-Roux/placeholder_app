@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder_app/core/constants/constants.dart';
-import 'package:placeholder_app/features/tasks/models/task.dart';
-import 'package:placeholder_app/features/tasks/usecases/get_user_name_from_id.dart';
+import 'package:placeholder/core/constants/constants.dart';
+import 'package:placeholder/features/tasks/models/task.dart';
+import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
+
+import '../../../core/usecases/is_dark_mode.dart';
 
 class TaskCard extends StatelessWidget {
   const TaskCard(
@@ -29,21 +31,19 @@ class TaskCard extends StatelessWidget {
         margin: EdgeInsets.all(4),
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                  blurRadius: 3,
-                  color: Colors.black12,
-                  spreadRadius: 1,
-                  offset: Offset(2, 2))
-            ]),
+            color: isDarkMode(context)
+                ? const Color.fromARGB(255, 39, 39, 39)
+                : Constants.colors.tasksColor,
+            borderRadius: BorderRadius.circular(20)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               task.title,
-              style: Constants.textStyles.title3,
+              style: Constants.textStyles.title3.copyWith(
+                  color: isDarkMode(context)
+                      ? const Color.fromARGB(255, 238, 238, 238)
+                      : Colors.black),
             ),
             if (task.content != null && task.content!.isNotEmpty)
               Text(
@@ -56,13 +56,16 @@ class TaskCard extends StatelessWidget {
               children: [
                 Text(
                   "By: ${userNameFromID(context, userId: task.authorId)}",
-                  style: Constants.textStyles.data,
+                  style: Constants.textStyles.data.copyWith(
+                      color: isDarkMode(context)
+                          ? const Color.fromARGB(255, 153, 153, 153)
+                          : Colors.black),
                 ),
                 if (task.recurring)
                   Text(
                     "Recurring",
                     style: Constants.textStyles.data.copyWith(
-                      color: Colors.green,
+                      color: Colors.grey,
                     ),
                   ),
               ],

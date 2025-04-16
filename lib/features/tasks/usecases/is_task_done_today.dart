@@ -1,4 +1,4 @@
-import 'package:placeholder_app/features/tasks/models/task.dart';
+import 'package:placeholder/features/tasks/models/task.dart';
 
 bool isTaskDoneToday(Task task) {
   bool isTaskDoneToday = false;

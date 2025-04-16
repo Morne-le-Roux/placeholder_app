@@ -1,4 +1,4 @@
-package com.example.placeholder_app
+package co.za.disnetdev.placeholder
 
 import io.flutter.embedding.android.FlutterActivity
 
