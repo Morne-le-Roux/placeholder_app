@@ -20,57 +20,89 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isLTR = Directionality.of(context) == TextDirection.ltr;
-    return Dismissible(
-      key: Key(task.id),
-      background: isLTR ? _DeleteIcon() : _CompleteIcon(),
-      secondaryBackground: isLTR ? _CompleteIcon() : _DeleteIcon(),
-      onDismissed: (direction) {
-        direction == DismissDirection.startToEnd ? onDismissed() : onDone();
-      },
-      child: Container(
-        margin: EdgeInsets.all(4),
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: isDarkMode(context)
-                ? const Color.fromARGB(255, 39, 39, 39)
-                : Constants.colors.tasksColor,
-            borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              task.title,
-              style: Constants.textStyles.title3.copyWith(
-                  color: isDarkMode(context)
-                      ? const Color.fromARGB(255, 238, 238, 238)
-                      : Colors.black),
-            ),
-            if (task.content != null && task.content!.isNotEmpty)
-              Text(
-                task.content!,
-                style: Constants.textStyles.description,
-              ),
-            Gap(20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "By: ${userNameFromID(context, userId: task.authorId)}",
-                  style: Constants.textStyles.data.copyWith(
-                      color: isDarkMode(context)
-                          ? const Color.fromARGB(255, 153, 153, 153)
-                          : Colors.black),
-                ),
-                if (task.recurring)
-                  Text(
-                    "Recurring",
-                    style: Constants.textStyles.data.copyWith(
-                      color: Colors.grey,
-                    ),
+    return GestureDetector(
+      onTap: () async {
+        bool? markAsDone = await showAdaptiveDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  backgroundColor: isDarkMode(context)
+                      ? const Color.fromARGB(255, 24, 24, 24)
+                      : null,
+                  title: Text(
+                    "Mark as done?",
+                    style: Constants.textStyles.title3.copyWith(
+                        color:
+                            isDarkMode(context) ? Colors.white : Colors.black),
                   ),
-              ],
-            ),
-          ],
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: Text("Yes")),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: Text("No")),
+                  ],
+                ));
+        if (markAsDone == true) {
+          onDone();
+        }
+      },
+      child: Dismissible(
+        key: Key(task.id),
+        background: isLTR ? _DeleteIcon() : _CompleteIcon(),
+        secondaryBackground: isLTR ? _CompleteIcon() : _DeleteIcon(),
+        onDismissed: (direction) {
+          direction == DismissDirection.startToEnd ? onDismissed() : onDone();
+        },
+        child: Container(
+          margin: EdgeInsets.all(4),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: isDarkMode(context)
+                  ? const Color.fromARGB(255, 39, 39, 39)
+                  : Constants.colors.tasksColor,
+              borderRadius: BorderRadius.circular(20)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                task.title,
+                style: Constants.textStyles.title3.copyWith(
+                    color: isDarkMode(context)
+                        ? const Color.fromARGB(255, 238, 238, 238)
+                        : Colors.black),
+              ),
+              if (task.content != null && task.content!.isNotEmpty)
+                Text(
+                  task.content!,
+                  style: Constants.textStyles.description,
+                ),
+              Gap(20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "By: ${userNameFromID(context, userId: task.authorId)}",
+                    style: Constants.textStyles.data.copyWith(
+                        color: isDarkMode(context)
+                            ? const Color.fromARGB(255, 153, 153, 153)
+                            : Colors.black),
+                  ),
+                  if (task.recurring)
+                    Text(
+                      "Recurring",
+                      style: Constants.textStyles.data.copyWith(
+                        color: Colors.grey,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
