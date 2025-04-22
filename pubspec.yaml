@@ -1,7 +1,7 @@
 name: placeholder
 description: "A new Flutter project."
 publish_to: "none"
-version: 0.2.2+5
+version: 0.3.3+6
 
 environment:
   sdk: ^3.6.0
@@ -17,6 +17,7 @@ dependencies:
   pocketbase: ^0.22.0
   supabase_flutter: ^2.8.4
   uuid: ^4.5.1
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_lints: ^5.0.0

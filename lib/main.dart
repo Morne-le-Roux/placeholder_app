@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:placeholder/core/themes/text_form_field_theme.dart';
+import 'package:placeholder/core/usecases/init_pb.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
@@ -10,11 +11,12 @@ import 'package:pocketbase/pocketbase.dart';
 import 'features/tasks/cubit/task_cubit.dart';
 
 late PocketBase pb;
+late AuthStore authStore;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  pb = PocketBase(dotenv.env['POCKETBASE_URL']!);
+  await initPB();
 
   runApp(MultiBlocProvider(
     providers: [
