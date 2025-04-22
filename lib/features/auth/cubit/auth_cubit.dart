@@ -11,8 +11,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> login(String email, String password) async {
     try {
-      await supabaseClient.auth
-          .signInWithPassword(email: email, password: password);
+      await pb.collection("users").authWithPassword(email, password);
     } catch (e) {
       rethrow;
     }
@@ -20,8 +19,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> register(String email, String password) async {
     try {
-      await supabaseClient.auth.signUp(email: email, password: password);
-      await login(email, password);
+      await pb.collection("users").create(
+        body: {
+          "email": email,
+          "password": password,
+          "passwordConfirm": password,
+        },
+      );
     } catch (e) {
       rethrow;
     }
@@ -30,9 +34,10 @@ class AuthCubit extends Cubit<AuthState> {
   Future<List<PHUser>> fetchUsers() async {
     try {
       List<PHUser> phUsers = [];
-      final response = await supabaseClient.from("ph_users").select();
-      for (var phuMap in response) {
-        phUsers.add(PHUser.fromMap(phuMap));
+      final response = await pb.collection("ph_users").getList();
+
+      for (var phuRecord in response.items) {
+        phUsers.add(PHUser.fromMap(phuRecord.toJson()));
       }
       emit(state.copyWith(phUsers: phUsers));
       return phUsers;
@@ -47,7 +52,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> createUser(PHUser phUser) async {
     try {
-      await supabaseClient.from('ph_users').insert(phUser.toMap());
+      final response = await pb.collection("ph_users").create(
+            body: phUser.toMap(),
+          );
+      emit(state.copyWith(phUser: PHUser.fromMap(response.toJson())));
     } catch (e) {
       rethrow;
     }

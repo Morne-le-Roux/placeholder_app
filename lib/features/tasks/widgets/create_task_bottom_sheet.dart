@@ -33,10 +33,10 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
   @override
   void initState() {
     task = Task(
-      id: Uuid().v4(),
+      id: Uuid().v4().replaceAll("-", ""),
       userId: widget.phUser.id,
       authorId: authCubit.state.phUser?.id ?? "",
-      accountHolderId: supabaseClient.auth.currentUser?.id ?? "",
+      accountHolderId: pb.authStore.record?.id ?? "",
       title: "",
       content: "",
       recurring: false,

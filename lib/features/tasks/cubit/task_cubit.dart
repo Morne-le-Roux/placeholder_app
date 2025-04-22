@@ -11,7 +11,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> createTask(Task task) async {
     try {
-      await supabaseClient.from("tasks").insert(task.toMap());
+      await pb.collection("tasks").create(body: task.toMap());
     } catch (e) {
       rethrow;
     }
@@ -19,7 +19,10 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> updateTask(Task task) async {
     try {
-      await supabaseClient.from("tasks").update(task.toMap()).eq("id", task.id);
+      await pb.collection("tasks").update(
+            task.id,
+            body: task.toMap(),
+          );
     } catch (e) {
       rethrow;
     }
@@ -27,7 +30,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> deleteTask(Task task) async {
     try {
-      await supabaseClient.from("tasks").delete().eq("id", task.id);
+      await pb.collection("tasks").delete(task.id);
     } catch (e) {
       rethrow;
     }
@@ -35,9 +38,10 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<List<Task>> fetchTasks(String userId) async {
     try {
-      final response =
-          await supabaseClient.from("tasks").select().eq("user_id", userId);
-      return response.map((e) => Task.fromMap(e)).toList();
+      final response = await pb
+          .collection("tasks")
+          .getFullList(filter: "user_id = '$userId'");
+      return response.map((e) => Task.fromMap(e.toJson())).toList();
     } catch (e) {
       rethrow;
     }

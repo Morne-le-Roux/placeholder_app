@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
@@ -42,6 +44,7 @@ class _ChooseUserState extends State<ChooseUser> {
       phUsers = await authCubit.fetchUsers();
     } catch (e) {
       snack(context, e.toString());
+      log(e.toString());
     } finally {
       setState(() => loadingUsers = false);
     }

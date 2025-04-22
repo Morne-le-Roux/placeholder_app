@@ -28,11 +28,11 @@ class _CreateUserState extends State<CreateUser> {
   @override
   void initState() {
     phUser = PHUser(
-        id: Uuid().v4(),
+        id: Uuid().v4().replaceAll("-", ""),
         name: "",
         avatarURL: null,
         isDashboard: false,
-        accountHolderID: supabaseClient.auth.currentUser?.id ?? "");
+        accountHolderID: pb.authStore.record?.id ?? "");
     super.initState();
   }
 

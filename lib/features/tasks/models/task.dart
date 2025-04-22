@@ -42,7 +42,7 @@ class Task {
         title: map['title'] as String,
         content: map['content'] as String,
         recurring: map['recurring'] == null ? false : map['recurring'] as bool,
-        createdAt: map['created_at'] as String,
+        createdAt: map['created'] as String,
         lastDone: map['last_done'] as String?,
         authorId: map["author_id"] as String?);
   }

@@ -124,6 +124,7 @@ class _LoginState extends State<Login> {
                       setState(() => _isLoading = true);
                       if (_register) {
                         await authCubit.register(_email, _password);
+                        await authCubit.login(_email, _password);
                       } else {
                         await authCubit.login(_email, _password);
                       }

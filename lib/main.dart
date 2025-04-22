@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,7 +6,6 @@ import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
 import 'package:pocketbase/pocketbase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/tasks/cubit/task_cubit.dart';
 
@@ -15,15 +13,8 @@ late PocketBase pb;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  switch (kDebugMode) {
-    case true:
-      await dotenv.load(fileName: "staging.env");
-      break;
-    case false:
-      await dotenv.load(fileName: "prod.env");
-      break;
-  }
+  await dotenv.load(fileName: ".env");
+  pb = PocketBase(dotenv.env['POCKETBASE_URL']!);
 
   runApp(MultiBlocProvider(
     providers: [
@@ -33,8 +24,6 @@ void main() async {
     child: const MainApp(),
   ));
 }
-
-final SupabaseClient supabaseClient = Supabase.instance.client;
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -54,7 +43,7 @@ class MainApp extends StatelessWidget {
           appBarTheme: AppBarTheme(
               color: Colors.black, surfaceTintColor: Colors.transparent)),
       themeMode: ThemeMode.system,
-      home: supabaseClient.auth.currentSession != null ? ChooseUser() : Login(),
+      home: pb.authStore.token.isNotEmpty ? ChooseUser() : Login(),
     );
   }
 }

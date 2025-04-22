@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder/core/usecases/is_portrait.dart';
 import 'package:placeholder/core/widgets/avatar.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
