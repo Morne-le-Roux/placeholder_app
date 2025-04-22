@@ -6,10 +6,12 @@ import 'package:placeholder/core/themes/text_form_field_theme.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
-import 'package:placeholder/core/usecases/init_supabase.dart';
+import 'package:pocketbase/pocketbase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/tasks/cubit/task_cubit.dart';
+
+late PocketBase pb;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,8 +24,6 @@ void main() async {
       await dotenv.load(fileName: "prod.env");
       break;
   }
-
-  await initSupabase();
 
   runApp(MultiBlocProvider(
     providers: [
