@@ -3,6 +3,8 @@ import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/features/tasks/models/task.dart';
 import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
+import 'package:placeholder/features/tasks/widgets/clipped_dismissable.dart'
+    as cd;
 
 import '../../../core/usecases/is_dark_mode.dart';
 
@@ -51,57 +53,77 @@ class TaskCard extends StatelessWidget {
           onDone();
         }
       },
-      child: Dismissible(
-        key: Key(task.id),
-        background: isLTR ? _DeleteIcon() : _CompleteIcon(),
-        secondaryBackground: isLTR ? _CompleteIcon() : _DeleteIcon(),
-        onDismissed: (direction) {
-          direction == DismissDirection.startToEnd ? onDismissed() : onDone();
-        },
-        child: Container(
-          margin: EdgeInsets.all(4),
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: isDarkMode(context)
-                  ? const Color.fromARGB(255, 39, 39, 39)
-                  : Constants.colors.tasksColor,
-              borderRadius: BorderRadius.circular(20)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                task.title,
-                style: Constants.textStyles.title3.copyWith(
-                    color: isDarkMode(context)
-                        ? const Color.fromARGB(255, 238, 238, 238)
-                        : Colors.black),
-              ),
-              if (task.content != null && task.content!.isNotEmpty)
-                Text(
-                  task.content!,
-                  style: Constants.textStyles.description,
-                ),
-              Gap(20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: cd.ClippedDismissible(
+            key: Key(task.id),
+            background: isLTR ? _DeleteIcon() : _CompleteIcon(),
+            secondaryBackground: isLTR ? _CompleteIcon() : _DeleteIcon(),
+            onDismissed: (direction) {
+              direction == cd.DismissDirection.startToEnd
+                  ? onDismissed()
+                  : onDone();
+            },
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: isDarkMode(context)
+                      ? const Color.fromARGB(255, 39, 39, 39)
+                      : Constants.colors.tasksColor,
+                  gradient: isDarkMode(context)
+                      ? LinearGradient(colors: [
+                          const Color.fromARGB(255, 41, 41, 41),
+                          const Color.fromARGB(255, 0, 0, 0),
+                        ], begin: Alignment.topLeft, end: Alignment.bottomRight)
+                      : LinearGradient(
+                          colors: [
+                            Constants.colors.tasksColorSec,
+                            Constants.colors.tasksColor,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(20)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "By: ${userNameFromID(context, userId: task.authorId)}",
-                    style: Constants.textStyles.data.copyWith(
+                    task.title,
+                    style: Constants.textStyles.title3.copyWith(
                         color: isDarkMode(context)
-                            ? const Color.fromARGB(255, 153, 153, 153)
+                            ? const Color.fromARGB(255, 238, 238, 238)
                             : Colors.black),
                   ),
-                  if (task.recurring)
+                  if (task.content != null && task.content!.isNotEmpty)
                     Text(
-                      "Recurring",
-                      style: Constants.textStyles.data.copyWith(
-                        color: Colors.grey,
-                      ),
+                      task.content!,
+                      style: Constants.textStyles.description,
                     ),
+                  Gap(20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "By: ${userNameFromID(context, userId: task.authorId)}",
+                        style: Constants.textStyles.data.copyWith(
+                            color: isDarkMode(context)
+                                ? const Color.fromARGB(255, 153, 153, 153)
+                                : Colors.black),
+                      ),
+                      if (task.recurring)
+                        Text(
+                          "Daily",
+                          style: Constants.textStyles.data.copyWith(
+                            color: Colors.grey,
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
