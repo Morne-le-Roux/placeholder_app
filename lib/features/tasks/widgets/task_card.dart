@@ -6,8 +6,6 @@ import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
 import 'package:placeholder/features/tasks/widgets/clipped_dismissable.dart'
     as cd;
 
-import '../../../core/usecases/is_dark_mode.dart';
-
 class TaskCard extends StatelessWidget {
   const TaskCard(
       {super.key,
@@ -27,14 +25,11 @@ class TaskCard extends StatelessWidget {
         bool? markAsDone = await showAdaptiveDialog(
             context: context,
             builder: (context) => AlertDialog(
-                  backgroundColor: isDarkMode(context)
-                      ? const Color.fromARGB(255, 24, 24, 24)
-                      : null,
+                  backgroundColor: const Color.fromARGB(255, 24, 24, 24),
                   title: Text(
                     "Mark as done?",
-                    style: Constants.textStyles.title3.copyWith(
-                        color:
-                            isDarkMode(context) ? Colors.white : Colors.black),
+                    style: Constants.textStyles.title3
+                        .copyWith(color: Colors.white),
                   ),
                   actions: [
                     TextButton(
@@ -58,6 +53,34 @@ class TaskCard extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: cd.ClippedDismissible(
+            confirmDismiss: (direction) async {
+              if (direction == cd.DismissDirection.startToEnd) {
+                return showAdaptiveDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    backgroundColor: const Color.fromARGB(255, 24, 24, 24),
+                    title: Text(
+                      "Delete task?",
+                      style: Constants.textStyles.title3
+                          .copyWith(color: Colors.white),
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                          child: Text("Yes")),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                          child: Text("No")),
+                    ],
+                  ),
+                );
+              }
+              return true;
+            },
             key: Key(task.id),
             background: isLTR ? _DeleteIcon() : _CompleteIcon(),
             secondaryBackground: isLTR ? _CompleteIcon() : _DeleteIcon(),
@@ -69,22 +92,11 @@ class TaskCard extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  color: isDarkMode(context)
-                      ? const Color.fromARGB(255, 39, 39, 39)
-                      : Constants.colors.tasksColor,
-                  gradient: isDarkMode(context)
-                      ? LinearGradient(colors: [
-                          const Color.fromARGB(255, 41, 41, 41),
-                          const Color.fromARGB(255, 0, 0, 0),
-                        ], begin: Alignment.topLeft, end: Alignment.bottomRight)
-                      : LinearGradient(
-                          colors: [
-                            Constants.colors.tasksColorSec,
-                            Constants.colors.tasksColor,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                  color: const Color.fromARGB(255, 39, 39, 39),
+                  gradient: LinearGradient(colors: [
+                    const Color.fromARGB(255, 41, 41, 41),
+                    const Color.fromARGB(255, 0, 0, 0),
+                  ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,9 +104,7 @@ class TaskCard extends StatelessWidget {
                   Text(
                     task.title,
                     style: Constants.textStyles.title3.copyWith(
-                        color: isDarkMode(context)
-                            ? const Color.fromARGB(255, 238, 238, 238)
-                            : Colors.black),
+                        color: const Color.fromARGB(255, 238, 238, 238)),
                   ),
                   if (task.content != null && task.content!.isNotEmpty)
                     Text(
@@ -108,9 +118,7 @@ class TaskCard extends StatelessWidget {
                       Text(
                         "By: ${userNameFromID(context, userId: task.authorId)}",
                         style: Constants.textStyles.data.copyWith(
-                            color: isDarkMode(context)
-                                ? const Color.fromARGB(255, 153, 153, 153)
-                                : Colors.black),
+                            color: const Color.fromARGB(255, 153, 153, 153)),
                       ),
                       if (task.recurring)
                         Text(
@@ -141,6 +149,10 @@ class _DeleteIcon extends StatelessWidget {
       margin: EdgeInsets.all(4),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
+        gradient: LinearGradient(colors: [
+          const Color.fromARGB(255, 255, 60, 0),
+          const Color.fromARGB(0, 253, 59, 0),
+        ]),
         color: Colors.deepOrangeAccent,
         borderRadius: BorderRadius.circular(20),
       ),
@@ -162,7 +174,12 @@ class _CompleteIcon extends StatelessWidget {
       margin: EdgeInsets.all(4),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.blue),
+          gradient: LinearGradient(colors: [
+            const Color.fromARGB(0, 33, 149, 243),
+            const Color.fromARGB(255, 0, 102, 255),
+          ]),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.blue),
       child: Icon(
         Icons.check,
         color: Colors.white,

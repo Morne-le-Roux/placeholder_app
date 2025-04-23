@@ -9,7 +9,6 @@ import 'package:placeholder/core/usecases/snack.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/constants.dart';
-import '../../../core/usecases/is_dark_mode.dart';
 import '../cubit/auth_cubit.dart';
 
 class CreateUser extends StatefulWidget {
@@ -40,9 +39,7 @@ class _CreateUserState extends State<CreateUser> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: isDarkMode(context)
-              ? const Color.fromARGB(255, 19, 19, 19)
-              : Colors.white,
+          color: const Color.fromARGB(255, 19, 19, 19),
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       padding: EdgeInsets.all(20),
       child: Column(
@@ -50,27 +47,21 @@ class _CreateUserState extends State<CreateUser> {
         children: [
           TextFormField(
             initialValue: phUser.name,
-            style: Constants.textStyles.description.copyWith(
-                color: isDarkMode(context)
-                    ? const Color.fromARGB(255, 207, 207, 207)
-                    : Colors.black),
+            style: Constants.textStyles.description
+                .copyWith(color: const Color.fromARGB(255, 207, 207, 207)),
             onChanged: (value) =>
                 setState(() => phUser = phUser.copyWith(name: value)),
             decoration: InputDecoration(
                 labelText: "User Name",
-                labelStyle: Constants.textStyles.data.copyWith(
-                    color: isDarkMode(context)
-                        ? const Color.fromARGB(255, 207, 207, 207)
-                        : Colors.black)),
+                labelStyle: Constants.textStyles.data
+                    .copyWith(color: const Color.fromARGB(255, 207, 207, 207))),
           ),
           Gap(20),
           Row(
             children: [
               Text("Dashboard",
                   style: Constants.textStyles.description.copyWith(
-                      color: isDarkMode(context)
-                          ? const Color.fromARGB(255, 207, 207, 207)
-                          : Colors.black)),
+                      color: const Color.fromARGB(255, 207, 207, 207))),
               Expanded(child: SizedBox()),
               Switch(
                   value: phUser.isDashboard,

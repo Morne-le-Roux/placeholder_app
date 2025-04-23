@@ -6,7 +6,6 @@ import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/constants.dart';
-import '../../../core/usecases/is_dark_mode.dart';
 import '../../../core/usecases/snack.dart';
 import '../../../core/widgets/buttons/large_rounded_button.dart';
 import '../../../main.dart';
@@ -49,9 +48,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode(context)
-            ? const Color.fromARGB(255, 19, 19, 19)
-            : Colors.white,
+        color: const Color.fromARGB(255, 19, 19, 19),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -62,24 +59,18 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
         child: Column(
           children: [
             Text("Create Task for ${widget.phUser.name}",
-                style: Constants.textStyles.title3.copyWith(
-                    color: isDarkMode(context)
-                        ? const Color.fromARGB(255, 207, 207, 207)
-                        : Colors.black)),
+                style: Constants.textStyles.title3
+                    .copyWith(color: const Color.fromARGB(255, 207, 207, 207))),
             Gap(20),
             TextFormField(
               textCapitalization: TextCapitalization.sentences,
-              style: Constants.textStyles.description.copyWith(
-                  color: isDarkMode(context)
-                      ? const Color.fromARGB(255, 207, 207, 207)
-                      : Colors.black),
+              style: Constants.textStyles.description
+                  .copyWith(color: const Color.fromARGB(255, 207, 207, 207)),
               validator: (value) => value!.isEmpty ? "Title is required" : null,
               decoration: InputDecoration(
                   labelText: "Title",
                   labelStyle: Constants.textStyles.data.copyWith(
-                      color: isDarkMode(context)
-                          ? const Color.fromARGB(255, 207, 207, 207)
-                          : Colors.black)),
+                      color: const Color.fromARGB(255, 207, 207, 207))),
               initialValue: task.title,
               onChanged: (value) =>
                   setState(() => task = task.copyWith(title: value)),
@@ -87,17 +78,13 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
             Gap(20),
             TextFormField(
               textCapitalization: TextCapitalization.sentences,
-              style: Constants.textStyles.description.copyWith(
-                  color: isDarkMode(context)
-                      ? const Color.fromARGB(255, 207, 207, 207)
-                      : Colors.black),
+              style: Constants.textStyles.description
+                  .copyWith(color: const Color.fromARGB(255, 207, 207, 207)),
               decoration: InputDecoration(
                   labelText: "Description",
                   alignLabelWithHint: true,
                   labelStyle: Constants.textStyles.data.copyWith(
-                      color: isDarkMode(context)
-                          ? const Color.fromARGB(255, 207, 207, 207)
-                          : Colors.black)),
+                      color: const Color.fromARGB(255, 207, 207, 207))),
               initialValue: task.content,
               maxLines: 5,
               onChanged: (value) =>
@@ -109,9 +96,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
               children: [
                 Text("Recurring (Daily)",
                     style: Constants.textStyles.description.copyWith(
-                        color: isDarkMode(context)
-                            ? const Color.fromARGB(255, 207, 207, 207)
-                            : Colors.black)),
+                        color: const Color.fromARGB(255, 207, 207, 207))),
                 Switch(
                     value: task.recurring,
                     onChanged: (value) =>

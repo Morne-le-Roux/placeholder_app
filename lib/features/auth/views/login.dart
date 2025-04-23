@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:placeholder/core/usecases/is_dark_mode.dart';
 import 'package:placeholder/core/widgets/buttons/large_rounded_button.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/usecases/validate_email.dart';
@@ -58,17 +57,13 @@ class _LoginState extends State<Login> {
               spacing: 20,
               children: [
                 Text(_register ? "Register" : "Login",
-                    style: Constants.textStyles.title.copyWith(
-                        color:
-                            isDarkMode(context) ? Colors.white : Colors.black,
-                        fontSize: 30)),
+                    style: Constants.textStyles.title
+                        .copyWith(color: Colors.white, fontSize: 30)),
                 Gap(20),
                 TextFormField(
                     autovalidateMode: AutovalidateMode.onUnfocus,
                     initialValue: _email,
-                    style: TextStyle(
-                        color:
-                            isDarkMode(context) ? Colors.white : Colors.black),
+                    style: TextStyle(color: Colors.white),
                     validator: (value) {
                       String? error = validateEmail(value);
                       setState(() => _isValid = false);
@@ -81,9 +76,7 @@ class _LoginState extends State<Login> {
                     focusNode: _emailFocusNode),
                 TextFormField(
                     autovalidateMode: AutovalidateMode.onUnfocus,
-                    style: TextStyle(
-                        color:
-                            isDarkMode(context) ? Colors.white : Colors.black),
+                    style: TextStyle(color: Colors.white),
                     initialValue: _password,
                     obscureText: true,
                     validator: (value) {
@@ -102,10 +95,7 @@ class _LoginState extends State<Login> {
                   duration: const Duration(milliseconds: 200),
                   child: _register
                       ? TextFormField(
-                          style: TextStyle(
-                              color: isDarkMode(context)
-                                  ? Colors.white
-                                  : Colors.black),
+                          style: TextStyle(color: Colors.white),
                           autovalidateMode: AutovalidateMode.onUnfocus,
                           initialValue: _password2,
                           obscureText: true,
@@ -154,10 +144,7 @@ class _LoginState extends State<Login> {
                   onTap: () => setState(() => _register = !_register),
                   child: Text(
                       "${_register ? "Already a member?" : "Not a member?"} ${_register ? "Login instead." : "Register instead."}",
-                      style: TextStyle(
-                          color:
-                              isDarkMode(context) ? Colors.white : Colors.black,
-                          fontSize: 16)),
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
               ],
             ),

@@ -11,7 +11,6 @@ import 'package:placeholder/features/tasks/usecases/is_task_done_today.dart';
 import 'package:placeholder/features/tasks/widgets/task_card.dart';
 
 import '../../../core/constants/constants.dart';
-import '../../../core/usecases/is_dark_mode.dart';
 import '../../../core/usecases/snack.dart';
 import '../../../core/widgets/loaders/main_loader.dart';
 import '../../tasks/cubit/task_cubit.dart';
@@ -83,9 +82,7 @@ class _UserListState extends State<UserList> {
                 border: Border(
                     right: BorderSide(
                         width: 0.5,
-                        color: isDarkMode(context)
-                            ? const Color.fromARGB(255, 36, 36, 36)
-                            : Colors.grey.shade300))),
+                        color: const Color.fromARGB(255, 36, 36, 36)))),
             child: SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
               child: Column(
@@ -109,9 +106,14 @@ class _UserListState extends State<UserList> {
                       margin: EdgeInsets.all(4),
                       padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: isDarkMode(context)
-                            ? const Color.fromARGB(255, 39, 39, 39)
-                            : Constants.colors.headerColor,
+                        gradient: LinearGradient(
+                            colors: [
+                              const Color.fromARGB(255, 41, 41, 41),
+                              const Color.fromARGB(255, 0, 0, 0),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight),
+                        color: const Color.fromARGB(255, 39, 39, 39),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
@@ -120,15 +122,13 @@ class _UserListState extends State<UserList> {
                           Gap(10),
                           Text(user.name,
                               style: Constants.textStyles.title3.copyWith(
-                                  color: isDarkMode(context)
-                                      ? const Color.fromARGB(255, 207, 207, 207)
-                                      : Colors.black)),
+                                  color: const Color.fromARGB(
+                                      255, 207, 207, 207))),
                           Gap(10),
                           if (!isDashboard)
                             Icon(Icons.keyboard_arrow_right_rounded,
-                                color: isDarkMode(context)
-                                    ? const Color.fromARGB(255, 207, 207, 207)
-                                    : Colors.black),
+                                color:
+                                    const Color.fromARGB(255, 207, 207, 207)),
                         ],
                       ),
                     ),
@@ -165,12 +165,8 @@ class _UserListState extends State<UserList> {
           bottom: 20,
           right: 10,
           child: FloatingActionButton.small(
-            backgroundColor: isDarkMode(context)
-                ? const Color.fromARGB(255, 39, 39, 39)
-                : Constants.colors.headerColor,
-            foregroundColor: isDarkMode(context)
-                ? const Color.fromARGB(255, 207, 207, 207)
-                : Colors.black,
+            backgroundColor: const Color.fromARGB(255, 39, 39, 39),
+            foregroundColor: const Color.fromARGB(255, 207, 207, 207),
             heroTag: "add_user_${user.id}",
             elevation: 2,
             child: Icon(Icons.add_rounded),

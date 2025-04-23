@@ -6,7 +6,6 @@ import 'package:placeholder/features/home/widgets/user_list.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 
 import '../../../core/constants/constants.dart';
-import '../../../core/usecases/is_dark_mode.dart';
 import '../../auth/cubit/auth_cubit.dart';
 import '../../auth/models/p_h_user.dart';
 
@@ -45,16 +44,15 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text("Today",
-            style: Constants.textStyles.title2.copyWith(
-                color: isDarkMode(context) ? Colors.white : Colors.black)),
+            style: Constants.textStyles.title2.copyWith(color: Colors.white)),
         actions: [
           GestureDetector(
             onTap: () => Nav.pop(context),
             child: Text(
               "User: ${authCubit.state.phUser?.name}    ",
-              style: Constants.textStyles.data.copyWith(
-                  color: isDarkMode(context) ? Colors.white : Colors.black),
+              style: Constants.textStyles.data.copyWith(color: Colors.white),
             ),
           )
         ],

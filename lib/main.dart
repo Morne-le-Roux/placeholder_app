@@ -36,15 +36,19 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
           inputDecorationTheme: inputDecorationTheme,
+          primarySwatch: Colors.deepOrange,
+          primaryColor: Colors.deepOrange,
           scaffoldBackgroundColor: Colors.white,
           appBarTheme: AppBarTheme(
               color: Colors.white, surfaceTintColor: Colors.transparent)),
       darkTheme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+          primaryColor: Colors.deepOrange,
           inputDecorationTheme: inputDecorationTheme,
           scaffoldBackgroundColor: Colors.black,
           appBarTheme: AppBarTheme(
               color: Colors.black, surfaceTintColor: Colors.transparent)),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       home: pb.authStore.token.isNotEmpty ? ChooseUser() : Login(),
     );
   }

@@ -67,7 +67,7 @@ class _ChooseUserState extends State<ChooseUser> {
         child: loadingUsers
             ? MainLoader()
             : Padding(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(20),
                 child: Wrap(
                   spacing: 40,
                   alignment: WrapAlignment.center,

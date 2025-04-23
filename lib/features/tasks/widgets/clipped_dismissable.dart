@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// @docImport 'scroll_view.dart';
 library;
 
 import 'package:flutter/gestures.dart';
@@ -261,6 +260,7 @@ class DismissUpdateDetails {
   final double progress;
 }
 
+// ignore: unused_element
 class _DismissibleClipper extends CustomClipper<Rect> {
   _DismissibleClipper({
     required this.axis,
