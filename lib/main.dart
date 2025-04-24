@@ -6,6 +6,7 @@ import 'package:placeholder/core/usecases/init_pb.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
+import 'package:placeholder/features/payment/usecases/init_rc.dart';
 import 'package:pocketbase/pocketbase.dart';
 
 import 'features/tasks/cubit/task_cubit.dart';
@@ -17,6 +18,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await initPB();
+  await initRC();
 
   runApp(MultiBlocProvider(
     providers: [

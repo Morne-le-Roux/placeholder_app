@@ -22,12 +22,12 @@ class _Colors {
 class _TextStyles {
   const _TextStyles();
 
-  final TextStyle title =
-      const TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
-  final TextStyle title2 =
-      const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-  final TextStyle title3 =
-      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+  final TextStyle title = const TextStyle(
+      fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white);
+  final TextStyle title2 = const TextStyle(
+      fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white);
+  final TextStyle title3 = const TextStyle(
+      fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white);
   final TextStyle description = const TextStyle(
     fontSize: 14,
     color: Colors.grey,

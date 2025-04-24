@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:placeholder/main.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../models/p_h_user.dart';
 
@@ -59,5 +61,28 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> checkSub() async {
+    final CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+
+    final bool isPro = customerInfo.activeSubscriptions.isNotEmpty;
+
+    if (isPro) {
+      emit(state.copyWith(
+        isPro: isPro,
+      ));
+    } else {
+      emit(state.copyWith(
+        isPro: false,
+      ));
+    }
+  }
+
+  Future<void> getSubscriptions() async {
+    final Offerings offerings = await Purchases.getOfferings();
+    final List<Package> subscriptions =
+        offerings.current?.availablePackages ?? [];
+    emit(state.copyWith(availableSubscriptions: subscriptions));
   }
 }
