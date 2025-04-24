@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:placeholder/core/themes/text_form_field_theme.dart';
 import 'package:placeholder/core/usecases/init_pb.dart';
+import 'package:placeholder/core/usecases/init_sentry.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
@@ -20,7 +21,8 @@ void main() async {
   await initPB();
   await initRC();
 
-  runApp(MultiBlocProvider(
+  await initSentry(
+      mainApp: MultiBlocProvider(
     providers: [
       BlocProvider(create: (context) => AuthCubit()),
       BlocProvider(create: (context) => TaskCubit()),

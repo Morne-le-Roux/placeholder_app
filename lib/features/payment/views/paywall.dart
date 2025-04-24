@@ -41,55 +41,59 @@ class _PaywallState extends State<Paywall> {
       body: SafeArea(
         child: loading
             ? MainLoader()
-            : Column(
-                children: [
-                  Gap(50),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20,
-                    ),
-                    width: double.infinity,
-                    child: FittedBox(
-                      child: Text(
-                        "PLACEHOLDER",
-                        style: Constants.textStyles.title.copyWith(
-                          fontWeight: FontWeight.w900,
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  children: [
+                    Gap(100),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
+                      width: double.infinity,
+                      child: FittedBox(
+                        child: Text(
+                          "PLACEHOLDER",
+                          style: Constants.textStyles.title.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(child: SizedBox()),
-                  Text(
-                    "Unlock all features and create unlimited tasks.",
-                    style: Constants.textStyles.title2,
-                    textAlign: TextAlign.center,
-                  ),
-                  Expanded(child: SizedBox()),
-                  BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      return Column(
-                        children: state.availableSubscriptions
-                            .map((e) => PricingOptionCard(
-                                title: toBeginningOfSentenceCase(
-                                    e.packageType.name),
-                                description: e.packageType.name == "annual"
-                                    ? "Renewed Annually.\nGet 2 Months Free."
-                                    : "Renewed every month",
-                                price: e.storeProduct.priceString,
-                                onPressed: () async {
-                                  try {
-                                    await Purchases.purchasePackage(e);
-                                  } catch (e) {
-                                    log("Error purchasing subscription: $e");
-                                    snack(context,
-                                        "Error purchasing subscription: $e");
-                                  }
-                                }))
-                            .toList(),
-                      );
-                    },
-                  ),
-                ],
+                    Expanded(child: SizedBox()),
+                    Text(
+                      "Unlock all features and create unlimited tasks.",
+                      style: Constants.textStyles.title2,
+                      textAlign: TextAlign.center,
+                    ),
+                    Expanded(child: SizedBox()),
+                    BlocBuilder<AuthCubit, AuthState>(
+                      builder: (context, state) {
+                        return Column(
+                          children: state.availableSubscriptions
+                              .map((e) => PricingOptionCard(
+                                  title: toBeginningOfSentenceCase(
+                                      e.packageType.name),
+                                  description: e.packageType.name == "annual"
+                                      ? "Renewed Annually.\nGet 2 Months Free."
+                                      : "Renewed every month",
+                                  price: e.storeProduct.priceString,
+                                  onPressed: () async {
+                                    try {
+                                      await Purchases.purchasePackage(e);
+                                      appCubit.setPro();
+                                    } catch (e) {
+                                      log("Error purchasing subscription: $e");
+                                      snack(context,
+                                          "Error purchasing subscription: $e");
+                                    }
+                                  }))
+                              .toList(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
       ),
     );
