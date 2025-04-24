@@ -9,6 +9,8 @@ import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/payment/usecases/init_rc.dart';
 import 'package:pocketbase/pocketbase.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import 'features/tasks/cubit/task_cubit.dart';
 
@@ -53,7 +55,14 @@ class MainApp extends StatelessWidget {
           appBarTheme: AppBarTheme(
               color: Colors.black, surfaceTintColor: Colors.transparent)),
       themeMode: ThemeMode.dark,
-      home: pb.authStore.token.isNotEmpty ? ChooseUser() : Login(),
+      home: Builder(builder: (context) {
+        if (pb.authStore.record?.id.isNotEmpty ?? false) {
+          Purchases.logIn(pb.authStore.record?.id ?? Uuid().v4());
+          return ChooseUser();
+        } else {
+          return Login();
+        }
+      }),
     );
   }
 }
