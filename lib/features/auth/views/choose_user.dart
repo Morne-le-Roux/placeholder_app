@@ -12,7 +12,10 @@ import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/features/payment/views/paywall.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:uuid/uuid.dart';
 
+import '../../../main.dart';
 import '../usecases/create_new_user.dart';
 
 class ChooseUser extends StatefulWidget {
@@ -45,6 +48,7 @@ class _ChooseUserState extends State<ChooseUser> {
     try {
       setState(() => loadingUsers = true);
       phUsers = await authCubit.fetchUsers();
+      await Purchases.logIn(pb.authStore.record?.id ?? Uuid().v4());
       await authCubit.checkSub();
     } catch (e) {
       snack(context, e.toString());

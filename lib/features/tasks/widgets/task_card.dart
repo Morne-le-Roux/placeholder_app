@@ -31,14 +31,14 @@ class _TaskCardState extends State<TaskCard> {
       SlidableAction(
         onPressed: (context) => _handleComplete(delete: true),
         borderRadius: BorderRadius.circular(16),
-        flex: 1,
+        padding: EdgeInsets.zero,
         icon: Icons.delete,
         label: "Delete",
         foregroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(100, 255, 86, 34),
       ),
       SlidableAction(
-        flex: 1,
+        padding: EdgeInsets.zero,
         borderRadius: BorderRadius.circular(16),
         onPressed: (context) => _handleComplete(delete: false),
         icon: Icons.check,
