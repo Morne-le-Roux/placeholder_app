@@ -9,6 +9,7 @@ class Task {
     required this.createdAt,
     required this.authorId,
     this.lastDone,
+    this.deleted,
   });
   final String id;
   final String userId;
@@ -19,6 +20,7 @@ class Task {
   final String createdAt;
   final String? lastDone;
   final String? authorId;
+  final bool? deleted;
 
   Map<String, dynamic> toMap() {
     return {
@@ -31,20 +33,23 @@ class Task {
       'created_at': createdAt,
       'last_done': lastDone,
       'author_id': authorId,
+      'deleted': deleted,
     };
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
-        id: map['id'] as String,
-        userId: map['user_id'] as String,
-        accountHolderId: map['account_holder_id'] as String,
-        title: map['title'] as String,
-        content: map['content'] as String,
-        recurring: map['recurring'] == null ? false : map['recurring'] as bool,
-        createdAt: map['created'] as String,
-        lastDone: map['last_done'] as String?,
-        authorId: map["author_id"] as String?);
+      id: map['id'] as String,
+      userId: map['user_id'] as String,
+      accountHolderId: map['account_holder_id'] as String,
+      title: map['title'] as String,
+      content: map['content'] as String,
+      recurring: map['recurring'] == null ? false : map['recurring'] as bool,
+      createdAt: map['created'] as String,
+      lastDone: map['last_done'] as String?,
+      authorId: map["author_id"] as String?,
+      deleted: map["deleted"] == null ? false : map["deleted"] as bool?,
+    );
   }
 
   Task copyWith({
@@ -57,6 +62,7 @@ class Task {
     String? createdAt,
     String? lastDone,
     String? authorId,
+    bool? deleted,
   }) {
     return Task(
       id: id ?? this.id,
@@ -68,6 +74,7 @@ class Task {
       createdAt: createdAt ?? this.createdAt,
       lastDone: lastDone ?? this.lastDone,
       authorId: authorId ?? this.authorId,
+      deleted: deleted ?? this.deleted,
     );
   }
 }

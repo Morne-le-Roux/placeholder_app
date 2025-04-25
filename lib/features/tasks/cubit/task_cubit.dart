@@ -30,7 +30,10 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> deleteTask(Task task) async {
     try {
-      await pb.collection("tasks").delete(task.id);
+      await pb.collection("tasks").update(
+            task.id,
+            body: task.copyWith(deleted: true).toMap(),
+          );
     } catch (e) {
       rethrow;
     }
@@ -40,7 +43,7 @@ class TaskCubit extends Cubit<TaskState> {
     try {
       final response = await pb
           .collection("tasks")
-          .getFullList(filter: "user_id = '$userId'");
+          .getFullList(filter: "user_id = '$userId' && deleted != true");
       return response.map((e) => Task.fromMap(e.toJson())).toList();
     } catch (e) {
       rethrow;
