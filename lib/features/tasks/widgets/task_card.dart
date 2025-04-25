@@ -23,6 +23,8 @@ class TaskCard extends StatefulWidget {
 class _TaskCardState extends State<TaskCard> {
   bool done = false;
 
+  double height = 80;
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> actions = [
@@ -33,7 +35,7 @@ class _TaskCardState extends State<TaskCard> {
         icon: Icons.delete,
         label: "Delete",
         foregroundColor: Colors.white,
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: const Color.fromARGB(100, 255, 86, 34),
       ),
       SlidableAction(
         flex: 1,
@@ -42,7 +44,7 @@ class _TaskCardState extends State<TaskCard> {
         icon: Icons.check,
         label: "Done",
         foregroundColor: Colors.white,
-        backgroundColor: Colors.lightBlueAccent,
+        backgroundColor: const Color.fromARGB(100, 64, 195, 255),
       ),
     ];
     return Padding(
@@ -78,89 +80,83 @@ class _TaskCardState extends State<TaskCard> {
                   widget.onDone();
                 }
               },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Slidable(
-              key: Key(widget.task.id),
-              endActionPane: ActionPane(
-                motion: DrawerMotion(),
-                children: actions,
-              ),
-              startActionPane: ActionPane(
-                motion: DrawerMotion(),
-                children: actions,
-              ),
-              child: done
-                  ? AnimatedContainer(
-                      duration: Duration(milliseconds: 500),
-                      alignment: Alignment.center,
-                      width: double.infinity,
-                      height: 80,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: done
-                              ? LinearGradient(colors: [
-                                  Colors.deepOrange,
-                                  const Color.fromARGB(0, 255, 86, 34),
-                                ])
-                              : null),
-                      child: Text(
-                        "Undo?",
-                        style: Constants.textStyles.title3,
+        child: Slidable(
+          key: Key(widget.task.id),
+          endActionPane: ActionPane(
+            extentRatio: 0.4,
+            motion: DrawerMotion(),
+            children: actions,
+          ),
+          startActionPane: ActionPane(
+            extentRatio: 0.4,
+            motion: DrawerMotion(),
+            children: actions,
+          ),
+          child: done
+              ? AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: height,
+                  curve: Curves.ease,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: done
+                          ? LinearGradient(colors: [
+                              const Color.fromARGB(100, 255, 86, 34),
+                              const Color.fromARGB(0, 255, 86, 34),
+                            ])
+                          : null),
+                  child: Text(
+                    "Undo?",
+                    style: Constants.textStyles.title3,
+                  ),
+                )
+              : Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 39, 39, 39),
+                      gradient: LinearGradient(colors: [
+                        const Color.fromARGB(255, 41, 41, 41),
+                        const Color.fromARGB(255, 0, 0, 0),
+                      ], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        widget.task.title,
+                        style: Constants.textStyles.title3.copyWith(
+                            color: const Color.fromARGB(255, 238, 238, 238)),
                       ),
-                    )
-                  : Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 39, 39, 39),
-                          gradient: LinearGradient(
-                              colors: [
-                                const Color.fromARGB(255, 41, 41, 41),
-                                const Color.fromARGB(255, 0, 0, 0),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                      if (widget.task.content != null &&
+                          widget.task.content!.isNotEmpty)
+                        Text(
+                          widget.task.content!,
+                          style: Constants.textStyles.description,
+                        ),
+                      Gap(10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            widget.task.title,
-                            style: Constants.textStyles.title3.copyWith(
+                            "By: ${userNameFromID(context, userId: widget.task.authorId)}",
+                            style: Constants.textStyles.data.copyWith(
                                 color:
-                                    const Color.fromARGB(255, 238, 238, 238)),
+                                    const Color.fromARGB(255, 153, 153, 153)),
                           ),
-                          if (widget.task.content != null &&
-                              widget.task.content!.isNotEmpty)
+                          if (widget.task.recurring)
                             Text(
-                              widget.task.content!,
-                              style: Constants.textStyles.description,
-                            ),
-                          Gap(10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "By: ${userNameFromID(context, userId: widget.task.authorId)}",
-                                style: Constants.textStyles.data.copyWith(
-                                    color: const Color.fromARGB(
-                                        255, 153, 153, 153)),
+                              "Daily",
+                              style: Constants.textStyles.data.copyWith(
+                                color: Colors.grey,
                               ),
-                              if (widget.task.recurring)
-                                Text(
-                                  "Daily",
-                                  style: Constants.textStyles.data.copyWith(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                            ],
-                          ),
+                            ),
                         ],
                       ),
-                    ),
-            ),
-          ],
+                    ],
+                  ),
+                ),
         ),
       ),
     );
@@ -168,7 +164,10 @@ class _TaskCardState extends State<TaskCard> {
 
   Future<void> _handleComplete({required bool delete}) async {
     setState(() => done = true);
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(Duration(seconds: 3));
+    setState(() => height = 0);
+    await Future.delayed(Duration(seconds: 1));
+
     if (!done) return;
     if (delete) {
       widget.onDismissed();

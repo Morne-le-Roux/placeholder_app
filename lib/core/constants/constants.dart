@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class Constants {
   static const _Colors colors = _Colors();
   static const _TextStyles textStyles = _TextStyles();
+  static const _Limits limits = _Limits();
 }
 
 class _Colors {
@@ -35,4 +36,12 @@ class _TextStyles {
 
   final TextStyle data = const TextStyle(
       fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic);
+}
+
+class _Limits {
+  const _Limits();
+
+  final int taskCountLimitPerUser = 3;
+  final int userCountLimit = 2;
+  final bool canViewDashboardOnFree = false;
 }

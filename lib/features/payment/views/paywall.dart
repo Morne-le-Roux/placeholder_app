@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/snack.dart';
@@ -20,6 +19,7 @@ class Paywall extends StatefulWidget {
 
 class _PaywallState extends State<Paywall> {
   AuthCubit get appCubit => context.read<AuthCubit>();
+  bool canMakePayments = false;
 
   @override
   void initState() {
@@ -28,8 +28,9 @@ class _PaywallState extends State<Paywall> {
   }
 
   Future<void> init() async {
+    canMakePayments = await Purchases.canMakePayments();
     setState(() => loading = true);
-    appCubit.getSubscriptions();
+    await appCubit.getSubscriptions();
     setState(() => loading = false);
   }
 
@@ -45,7 +46,7 @@ class _PaywallState extends State<Paywall> {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   children: [
-                    Gap(100),
+                    Expanded(child: SizedBox()),
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 20,
@@ -67,6 +68,12 @@ class _PaywallState extends State<Paywall> {
                       textAlign: TextAlign.center,
                     ),
                     Expanded(child: SizedBox()),
+                    if (!canMakePayments)
+                      Text(
+                        "It seems you are not connected to a authorized store. Please contact Support.",
+                        style: Constants.textStyles.title2,
+                        textAlign: TextAlign.center,
+                      ),
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return Column(

@@ -6,6 +6,7 @@ import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
+import 'package:placeholder/features/auth/usecases/can_create_user.dart';
 import 'package:placeholder/features/auth/widgets/user_selector.dart';
 import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
@@ -92,7 +93,11 @@ class _ChooseUserState extends State<ChooseUser> {
                           ),
                           UserSelector(
                             onTap: () async {
-                              await createNewUser(context);
+                              bool canCreateNewUser = canCreateUser(context,
+                                  currentUserCount: phUsers.length);
+                              if (canCreateNewUser) {
+                                await createNewUser(context);
+                              }
                               init();
                             },
                           ),

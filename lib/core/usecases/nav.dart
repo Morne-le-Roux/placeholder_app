@@ -3,18 +3,35 @@ import 'package:flutter/material.dart';
 class Nav {
   static void push(BuildContext context, Widget screen) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => screen,
-            settings: RouteSettings(name: screen.runtimeType.toString())));
+      context,
+      PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: 100),
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        settings: RouteSettings(name: screen.runtimeType.toString()),
+      ),
+    );
   }
 
   static void pushAndPop(BuildContext context, Widget screen) {
     Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-            builder: (context) => screen,
-            settings: RouteSettings(name: screen.runtimeType.toString())),
+        PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 100),
+          pageBuilder: (context, animation, secondaryAnimation) => screen,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          settings: RouteSettings(name: screen.runtimeType.toString()),
+        ),
         (route) => false);
   }
 

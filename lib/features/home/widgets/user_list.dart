@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:placeholder/core/widgets/avatar.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
+import 'package:placeholder/features/tasks/usecases/can_add_tasks.dart';
 import 'package:placeholder/features/tasks/usecases/is_task_done_today.dart';
 import 'package:placeholder/features/tasks/widgets/task_card.dart';
 
@@ -136,6 +137,7 @@ class _UserListState extends State<UserList> {
                   Gap(10),
                   ...tasks.map(
                     (task) => TaskCard(
+                      key: Key(task.id),
                       task: task,
                       onDone: () {
                         log("onDone ${task.id}");
@@ -171,7 +173,11 @@ class _UserListState extends State<UserList> {
             elevation: 2,
             child: Icon(Icons.add_rounded),
             onPressed: () async {
-              await createTask(context, user);
+              bool canTask =
+                  canAddTask(context, currentTaskCount: tasks.length);
+              if (canTask) {
+                await createTask(context, user);
+              }
               await init(showLoader: tasks.isEmpty);
             },
           ),
