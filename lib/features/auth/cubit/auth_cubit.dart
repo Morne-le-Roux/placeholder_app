@@ -91,4 +91,8 @@ class AuthCubit extends Cubit<AuthState> {
         offerings.current?.availablePackages ?? [];
     emit(state.copyWith(availableSubscriptions: subscriptions));
   }
+
+  Future<void> deleteUser(String userId) async {
+    await pb.collection("ph_users").delete(userId);
+  }
 }

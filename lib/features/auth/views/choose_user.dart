@@ -86,6 +86,7 @@ class _ChooseUserState extends State<ChooseUser> {
                         children: [
                           ...phUsers.map(
                             (phu) => UserSelector(
+                              key: Key(phu.id),
                               user: phu,
                               onTap: () {
                                 authCubit.setPHUser(phu);
@@ -93,9 +94,12 @@ class _ChooseUserState extends State<ChooseUser> {
                                   Nav.push(context, Dashboard());
                                 }
                               },
+                              onDelete: () =>
+                                  setState(() => phUsers.remove(phu)),
                             ),
                           ),
                           UserSelector(
+                            onDelete: () {},
                             onTap: () async {
                               bool canCreateNewUser = canCreateUser(context,
                                   currentUserCount: phUsers.length);
