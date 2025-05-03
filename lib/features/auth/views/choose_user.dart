@@ -47,9 +47,9 @@ class _ChooseUserState extends State<ChooseUser> {
   init() async {
     try {
       setState(() => loadingUsers = true);
-      phUsers = await authCubit.fetchUsers();
       await Purchases.logIn(pb.authStore.record?.id ?? Uuid().v4());
       await authCubit.checkSub();
+      phUsers = await authCubit.fetchUsers();
     } catch (e) {
       snack(context, e.toString());
       log(e.toString());
@@ -86,17 +86,15 @@ class _ChooseUserState extends State<ChooseUser> {
                         children: [
                           ...phUsers.map(
                             (phu) => UserSelector(
-                              key: Key(phu.id),
-                              user: phu,
-                              onTap: () {
-                                authCubit.setPHUser(phu);
-                                if (authCubit.state.phUser != null) {
-                                  Nav.push(context, Dashboard());
-                                }
-                              },
-                              onDelete: () =>
-                                  setState(() => phUsers.remove(phu)),
-                            ),
+                                key: Key(phu.id),
+                                user: phu,
+                                onTap: () {
+                                  authCubit.setPHUser(phu);
+                                  if (authCubit.state.phUser != null) {
+                                    Nav.push(context, Dashboard());
+                                  }
+                                },
+                                onDelete: () => init()),
                           ),
                           UserSelector(
                             onDelete: () {},

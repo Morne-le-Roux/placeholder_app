@@ -69,121 +69,126 @@ class _UserListState extends State<UserList> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        RefreshIndicator(
-          onRefresh: () async {
-            await init(showLoader: false);
-          },
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            constraints: BoxConstraints(minWidth: 100),
-            padding: EdgeInsets.only(top: 10, right: 5, left: 5),
-            decoration: BoxDecoration(
-                border: Border(
-                    right: BorderSide(
-                        width: 0.5,
-                        color: const Color.fromARGB(255, 36, 36, 36)))),
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  InkWell(
-                    onTap: !isDashboard
-                        ? () {
-                            setState(() {
-                              int currentIndex = authCubit.state.phUsers
-                                  .indexWhere((u) => u.id == user.id);
-                              int nextIndex = (currentIndex + 1) >=
-                                      authCubit.state.phUsers.length
-                                  ? 0
-                                  : currentIndex + 1;
-                              user = authCubit.state.phUsers[nextIndex];
-                              init(showLoader: true);
-                            });
-                          }
-                        : null,
-                    child: Container(
-                      margin: EdgeInsets.all(4),
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                              const Color.fromARGB(255, 41, 41, 41),
-                              const Color.fromARGB(255, 0, 0, 0),
+    return BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        return Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: () async {
+                await init(showLoader: false);
+              },
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                constraints: BoxConstraints(minWidth: 100),
+                padding: EdgeInsets.only(top: 10, right: 5, left: 5),
+                decoration: BoxDecoration(
+                    border: Border(
+                        right: BorderSide(
+                            width: 0.5,
+                            color: const Color.fromARGB(255, 36, 36, 36)))),
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      InkWell(
+                        onTap: !isDashboard
+                            ? () {
+                                setState(() {
+                                  int currentIndex = state.phUsers
+                                      .indexWhere((u) => u.id == user.id);
+                                  int nextIndex =
+                                      (currentIndex + 1) >= state.phUsers.length
+                                          ? 0
+                                          : currentIndex + 1;
+                                  user = state.phUsers[nextIndex];
+                                  init(showLoader: true);
+                                });
+                              }
+                            : null,
+                        child: Container(
+                          margin: EdgeInsets.all(4),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [
+                                  const Color.fromARGB(255, 41, 41, 41),
+                                  const Color.fromARGB(255, 0, 0, 0),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight),
+                            color: const Color.fromARGB(255, 39, 39, 39),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Avatar(url: user.avatarURL),
+                              Gap(10),
+                              Text(user.name,
+                                  style: Constants.textStyles.title3.copyWith(
+                                      color: const Color.fromARGB(
+                                          255, 207, 207, 207))),
+                              Gap(10),
+                              if (!isDashboard &&
+                                  authCubit.state.phUsers.length > 1)
+                                Icon(Icons.keyboard_arrow_right_rounded,
+                                    color: const Color.fromARGB(
+                                        255, 207, 207, 207)),
                             ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight),
-                        color: const Color.fromARGB(255, 39, 39, 39),
-                        borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          Avatar(url: user.avatarURL),
-                          Gap(10),
-                          Text(user.name,
-                              style: Constants.textStyles.title3.copyWith(
-                                  color: const Color.fromARGB(
-                                      255, 207, 207, 207))),
-                          Gap(10),
-                          if (!isDashboard)
-                            Icon(Icons.keyboard_arrow_right_rounded,
-                                color:
-                                    const Color.fromARGB(255, 207, 207, 207)),
-                        ],
+                      Gap(10),
+                      ...tasks.map(
+                        (task) => TaskCard(
+                          key: Key(task.id),
+                          task: task,
+                          onDone: () {
+                            log("onDone ${task.id}");
+                            setState(() =>
+                                tasks.removeWhere((t) => t.id == task.id));
+                            if (task.recurring) {
+                              taskCubit.updateTask(task.copyWith(
+                                  lastDone: DateTime.now().toString()));
+                            } else {
+                              taskCubit.deleteTask(task);
+                            }
+                          },
+                          onDismissed: () {
+                            log("onDismissed ${task.id}");
+                            setState(() =>
+                                tasks.removeWhere((t) => t.id == task.id));
+                            taskCubit.deleteTask(task);
+                          },
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  Gap(10),
-                  ...tasks.map(
-                    (task) => TaskCard(
-                      key: Key(task.id),
-                      task: task,
-                      onDone: () {
-                        log("onDone ${task.id}");
-                        setState(
-                            () => tasks.removeWhere((t) => t.id == task.id));
-                        if (task.recurring) {
-                          taskCubit.updateTask(task.copyWith(
-                              lastDone: DateTime.now().toString()));
-                        } else {
-                          taskCubit.deleteTask(task);
-                        }
-                      },
-                      onDismissed: () {
-                        log("onDismissed ${task.id}");
-                        setState(
-                            () => tasks.removeWhere((t) => t.id == task.id));
-                        taskCubit.deleteTask(task);
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-        Positioned(
-          bottom: 20,
-          right: 10,
-          child: FloatingActionButton.small(
-            backgroundColor: const Color.fromARGB(255, 39, 39, 39),
-            foregroundColor: const Color.fromARGB(255, 207, 207, 207),
-            heroTag: "add_user_${user.id}",
-            elevation: 2,
-            child: Icon(Icons.add_rounded),
-            onPressed: () async {
-              bool canTask =
-                  canAddTask(context, currentTaskCount: tasks.length);
-              if (canTask) {
-                await createTask(context, user);
-              }
-              await init(showLoader: tasks.isEmpty);
-            },
-          ),
-        ),
-        if (isLoading) Center(child: MainLoader()),
-      ],
+            Positioned(
+              bottom: 20,
+              right: 10,
+              child: FloatingActionButton.small(
+                backgroundColor: const Color.fromARGB(255, 39, 39, 39),
+                foregroundColor: const Color.fromARGB(255, 207, 207, 207),
+                heroTag: "add_user_${user.id}",
+                elevation: 2,
+                child: Icon(Icons.add_rounded),
+                onPressed: () async {
+                  bool canTask =
+                      canAddTask(context, currentTaskCount: tasks.length);
+                  if (canTask) {
+                    await createTask(context, user);
+                  }
+                  await init(showLoader: tasks.isEmpty);
+                },
+              ),
+            ),
+            if (isLoading) Center(child: MainLoader()),
+          ],
+        );
+      },
     );
   }
 }
