@@ -1,10 +1,10 @@
 name: placeholder
 description: "A new Flutter project."
 publish_to: "none"
-version: 0.6.2+21
+version: 0.7.0+22
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.7.2
 
 dependencies:
   collection: ^1.19.0

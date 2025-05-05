@@ -3,19 +3,18 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder/core/constants/constants.dart';
+import 'package:placeholder/core/usecases/contact_support.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:placeholder/features/auth/usecases/can_create_user.dart';
+import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/auth/widgets/user_selector.dart';
 import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/features/payment/views/paywall.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../../main.dart';
 import '../usecases/create_new_user.dart';
 
 class ChooseUser extends StatefulWidget {
@@ -47,7 +46,7 @@ class _ChooseUserState extends State<ChooseUser> {
   init() async {
     try {
       setState(() => loadingUsers = true);
-      await Purchases.logIn(pb.authStore.record?.id ?? Uuid().v4());
+      phUsers = await authCubit.fetchUsers();
       await authCubit.checkSub();
       phUsers = await authCubit.fetchUsers();
     } catch (e) {
@@ -62,13 +61,31 @@ class _ChooseUserState extends State<ChooseUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Choose a user"),
+        title: Text("Choose a user", style: Constants.textStyles.title2),
         actions: [
-          IconButton(
-              onPressed: () {
-                init();
-              },
-              icon: Icon(Icons.refresh))
+          PopupMenuButton(
+            color: const Color.fromARGB(255, 26, 26, 26),
+            onSelected: (value) {
+              if (value == "contact") {
+                contactSupport("");
+              } else if (value == "logOut") {
+                Nav.pushAndPop(context, Login());
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: "contact",
+                child: Text(
+                  "Contact Support",
+                  style: Constants.textStyles.title3,
+                ),
+              ),
+              PopupMenuItem(
+                value: "logOut",
+                child: Text("Log Out", style: Constants.textStyles.title3),
+              ),
+            ],
+          ),
         ],
       ),
       body: SafeArea(
@@ -86,21 +103,25 @@ class _ChooseUserState extends State<ChooseUser> {
                         children: [
                           ...phUsers.map(
                             (phu) => UserSelector(
-                                key: Key(phu.id),
-                                user: phu,
-                                onTap: () {
-                                  authCubit.setPHUser(phu);
-                                  if (authCubit.state.phUser != null) {
-                                    Nav.push(context, Dashboard());
-                                  }
-                                },
-                                onDelete: () => init()),
+                              key: Key(phu.id),
+                              user: phu,
+                              onTap: () {
+                                authCubit.setPHUser(phu);
+                                if (authCubit.state.phUser != null) {
+                                  Nav.push(context, Dashboard());
+                                }
+                              },
+                              onDelete: () =>
+                                  setState(() => phUsers.remove(phu)),
+                            ),
                           ),
                           UserSelector(
                             onDelete: () {},
                             onTap: () async {
-                              bool canCreateNewUser = canCreateUser(context,
-                                  currentUserCount: phUsers.length);
+                              bool canCreateNewUser = canCreateUser(
+                                context,
+                                currentUserCount: phUsers.length,
+                              );
                               if (canCreateNewUser) {
                                 await createNewUser(context);
                               }
@@ -139,7 +160,7 @@ class _ChooseUserState extends State<ChooseUser> {
                             ),
                           );
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),

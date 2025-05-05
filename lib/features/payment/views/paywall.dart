@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/snack.dart';
@@ -28,10 +29,15 @@ class _PaywallState extends State<Paywall> {
   }
 
   Future<void> init() async {
-    canMakePayments = await Purchases.canMakePayments();
-    setState(() => loading = true);
-    await appCubit.getSubscriptions();
-    setState(() => loading = false);
+    try {
+  canMakePayments = await Purchases.canMakePayments();
+  setState(() => loading = true);
+  await appCubit.getSubscriptions();
+  setState(() => loading = false);
+}  catch (e) {
+      setState(() => loading = false);
+      snack(context, e.toString());
+    }
   }
 
   bool loading = false;
@@ -74,6 +80,7 @@ class _PaywallState extends State<Paywall> {
                         style: Constants.textStyles.title2,
                         textAlign: TextAlign.center,
                       ),
+                      Gap(20),
                     BlocBuilder<AuthCubit, AuthState>(
                       builder: (context, state) {
                         return Column(

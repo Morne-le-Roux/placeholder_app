@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Constants {
@@ -24,24 +25,36 @@ class _TextStyles {
   const _TextStyles();
 
   final TextStyle title = const TextStyle(
-      fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white);
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+  );
   final TextStyle title2 = const TextStyle(
-      fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white);
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+  );
   final TextStyle title3 = const TextStyle(
-      fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white);
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+  );
   final TextStyle description = const TextStyle(
     fontSize: 14,
     color: Colors.grey,
   );
 
   final TextStyle data = const TextStyle(
-      fontSize: 12, fontWeight: FontWeight.w300, fontStyle: FontStyle.italic);
+    fontSize: 12,
+    fontWeight: FontWeight.w300,
+    fontStyle: FontStyle.italic,
+  );
 }
 
 class _Limits {
   const _Limits();
 
-  final int taskCountLimitPerUser = 3;
-  final int userCountLimit = 2;
-  final bool canViewDashboardOnFree = false;
+  final int taskCountLimitPerUser = kDebugMode ? 99 : 3;
+  final int userCountLimit = kDebugMode ? 99 : 2;
+  // final bool canViewDashboardOnFree = false;
 }

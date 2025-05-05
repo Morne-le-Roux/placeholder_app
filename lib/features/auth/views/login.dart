@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:placeholder/core/usecases/is_portrait.dart';
 import 'package:placeholder/core/widgets/buttons/large_rounded_button.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/usecases/validate_email.dart';
@@ -56,10 +57,24 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               spacing: 20,
               children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    width: isPortrait(context)
+                        ? MediaQuery.of(context).size.width
+                        : MediaQuery.of(context).size.height,
+
+                    child: FittedBox(
+                      child: Text("PLACEHOLDER",
+                          style: Constants.textStyles.title
+                              .copyWith(color: Colors.white, fontWeight: FontWeight.w900)),
+                    ),
+                  ),
+                ),
+                Gap(20),
                 Text(_register ? "Register" : "Login",
                     style: Constants.textStyles.title
-                        .copyWith(color: Colors.white, fontSize: 30)),
-                Gap(20),
+                        .copyWith(color: Colors.white, fontSize: 28)),
                 TextFormField(
                     autovalidateMode: AutovalidateMode.onUnfocus,
                     initialValue: _email,

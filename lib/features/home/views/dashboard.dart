@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:placeholder/core/usecases/is_portrait.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/home/widgets/user_list.dart';
@@ -45,8 +46,10 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Today",
-            style: Constants.textStyles.title2.copyWith(color: Colors.white)),
+        title: Text(
+          "Today",
+          style: Constants.textStyles.title2.copyWith(color: Colors.white),
+        ),
         actions: [
           GestureDetector(
             onTap: () => Nav.pop(context),
@@ -54,27 +57,65 @@ class _DashboardState extends State<Dashboard> {
               "User: ${authCubit.state.phUser?.name}    ",
               style: Constants.textStyles.data.copyWith(color: Colors.white),
             ),
-          )
+          ),
         ],
         automaticallyImplyLeading: false,
       ),
-      body: isLoading
-          ? Center(child: MainLoader())
-          : Container(
-              alignment: Alignment.center,
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: isDashboard
-                    ? Row(
-                        children: users
-                            .map(
-                                (user) => Expanded(child: UserList(user: user)))
-                            .toList())
-                    : UserList(user: authCubit.state.phUser!),
+      body:
+          isLoading
+              ? Center(child: MainLoader())
+              : Builder(
+                builder: (context) {
+                  bool isOnlyDashboard = users.isEmpty && isDashboard;
+
+                  if (isPortrait(context) && isDashboard) {
+                    Future.delayed(Duration(seconds: 1), () {
+                      snack(
+                        context,
+                        "This user is a Dashboard user, which is best viewed in landscape mode, on larger displays.",
+                        isError: false,
+                      );
+                    });
+                  }
+
+                  if (isOnlyDashboard) {
+                    return Container(
+                      alignment: Alignment.center,
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text(
+                          "No users found, create some to get started.",
+                          style: Constants.textStyles.title2,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+                  return Container(
+                    alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child:
+                          isDashboard
+                              ? Row(
+                                children:
+                                    users
+                                        .map(
+                                          (user) => Expanded(
+                                            child: UserList(user: user),
+                                          ),
+                                        )
+                                        .toList(),
+                              )
+                              : UserList(user: authCubit.state.phUser!),
+                    ),
+                  );
+                },
               ),
-            ),
     );
   }
 }

@@ -27,69 +27,82 @@ class _CreateUserState extends State<CreateUser> {
   @override
   void initState() {
     phUser = PHUser(
-        id: Uuid().v4().replaceAll("-", ""),
-        name: "",
-        avatarURL: null,
-        isDashboard: false,
-        accountHolderID: pb.authStore.record?.id ?? "");
+      id: Uuid().v4().replaceAll("-", ""),
+      name: "",
+      avatarURL: null,
+      isDashboard: false,
+      accountHolderID: pb.authStore.record?.id ?? "",
+    );
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
           color: const Color.fromARGB(255, 19, 19, 19),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      padding: EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextFormField(
-            initialValue: phUser.name,
-            style: Constants.textStyles.description
-                .copyWith(color: const Color.fromARGB(255, 207, 207, 207)),
-            onChanged: (value) =>
-                setState(() => phUser = phUser.copyWith(name: value)),
-            decoration: InputDecoration(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: phUser.name,
+              style: Constants.textStyles.description.copyWith(
+                color: const Color.fromARGB(255, 207, 207, 207),
+              ),
+              onChanged:
+                  (value) =>
+                      setState(() => phUser = phUser.copyWith(name: value)),
+              decoration: InputDecoration(
                 labelText: "User Name",
-                labelStyle: Constants.textStyles.data
-                    .copyWith(color: const Color.fromARGB(255, 207, 207, 207))),
-          ),
-          Gap(20),
-          Row(
-            children: [
-              Text("Dashboard",
+                labelStyle: Constants.textStyles.data.copyWith(
+                  color: const Color.fromARGB(255, 207, 207, 207),
+                ),
+              ),
+            ),
+            Gap(20),
+            Row(
+              children: [
+                Text(
+                  "Dashboard",
                   style: Constants.textStyles.description.copyWith(
-                      color: const Color.fromARGB(255, 207, 207, 207))),
-              Expanded(child: SizedBox()),
-              Switch(
+                    color: const Color.fromARGB(255, 207, 207, 207),
+                  ),
+                ),
+                Expanded(child: SizedBox()),
+                Switch(
                   value: phUser.isDashboard,
-                  onChanged: (value) => setState(
+                  onChanged:
+                      (value) => setState(
                         () => phUser = phUser.copyWith(isDashboard: value),
-                      ))
-            ],
-          ),
-          Gap(20),
-          LargeRoundedButton(
-            text: "Create User",
-            onPressed: () async {
-              try {
-                FocusScope.of(context).unfocus();
-                setState(() => loading = true);
-                await authCubit.createUser(phUser);
-                setState(() => loading = false);
-                Nav.pop(context);
-              } catch (e) {
-                setState(() => loading = false);
-                snack(context, e.toString());
-              }
-            },
-            isLoading: loading,
-            isValid: phUser.name.isNotEmpty,
-          ),
-          Gap(20),
-        ],
+                      ),
+                ),
+              ],
+            ),
+            Gap(20),
+            LargeRoundedButton(
+              text: "Create User",
+              onPressed: () async {
+                try {
+                  FocusScope.of(context).unfocus();
+                  setState(() => loading = true);
+                  await authCubit.createUser(phUser);
+                  setState(() => loading = false);
+                  Nav.pop(context);
+                } catch (e) {
+                  setState(() => loading = false);
+                  snack(context, e.toString());
+                }
+              },
+              isLoading: loading,
+              isValid: phUser.name.isNotEmpty,
+            ),
+            Gap(20),
+          ],
+        ),
       ),
     );
   }

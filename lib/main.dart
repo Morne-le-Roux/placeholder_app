@@ -24,13 +24,14 @@ void main() async {
   await initRC();
 
   await initSentry(
-      mainApp: MultiBlocProvider(
-    providers: [
-      BlocProvider(create: (context) => AuthCubit()),
-      BlocProvider(create: (context) => TaskCubit()),
-    ],
-    child: const MainApp(),
-  ));
+    mainApp: MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => TaskCubit()),
+      ],
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -41,27 +42,35 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          inputDecorationTheme: inputDecorationTheme,
-          primarySwatch: Colors.deepOrange,
-          primaryColor: Colors.deepOrange,
-          scaffoldBackgroundColor: Colors.white,
-          appBarTheme: AppBarTheme(
-              color: Colors.white, surfaceTintColor: Colors.transparent)),
+        inputDecorationTheme: inputDecorationTheme,
+        primarySwatch: Colors.deepOrange,
+        primaryColor: Colors.deepOrange,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          color: Colors.white,
+          surfaceTintColor: Colors.transparent,
+        ),
+      ),
       darkTheme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          primaryColor: Colors.deepOrange,
-          inputDecorationTheme: inputDecorationTheme,
-          scaffoldBackgroundColor: Colors.black,
-          appBarTheme: AppBarTheme(
-              color: Colors.black, surfaceTintColor: Colors.transparent)),
+        primarySwatch: Colors.deepOrange,
+        primaryColor: Colors.deepOrange,
+        inputDecorationTheme: inputDecorationTheme,
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: AppBarTheme(
+          color: Colors.black,
+          surfaceTintColor: Colors.transparent,
+        ),
+      ),
       themeMode: ThemeMode.dark,
-      home: Builder(builder: (context) {
-        if (pb.authStore.record?.id.isNotEmpty ?? false) {
-          return ChooseUser();
-        } else {
-          return Login();
-        }
-      }),
+      home: Builder(
+        builder: (context) {
+          if (pb.authStore.record?.id.isNotEmpty ?? false) {
+            return ChooseUser();
+          } else {
+            return Login();
+          }
+        },
+      ),
     );
   }
 }
