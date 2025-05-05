@@ -36,12 +36,15 @@ class _UserListState extends State<UserList> {
   Timer? _refreshTimer;
   List<Task> tasks = [];
   late PHUser user;
+  List<PHUser> phUsers = [];
 
   Future<void> init({bool showLoader = false}) async {
     try {
       setState(() => isLoading = showLoader);
       tasks = await taskCubit.fetchTasks(user.id);
       tasks.removeWhere((task) => isTaskDoneToday(task));
+      phUsers.addAll(authCubit.state.phUsers);
+      phUsers.removeWhere((u) => u.isDashboard);
       setState(() => isLoading = false);
     } catch (e) {
       setState(() => isLoading = false);
@@ -96,16 +99,14 @@ class _UserListState extends State<UserList> {
                       onTap:
                           !isDashboard
                               ? () {
-                                while (user.isDashboard) {
-                                  int currentIndex = authCubit.state.phUsers
-                                      .indexWhere((u) => u.id == user.id);
-                                  int nextIndex =
-                                      (currentIndex + 1) >=
-                                              authCubit.state.phUsers.length
-                                          ? 0
-                                          : currentIndex + 1;
-                                  user = authCubit.state.phUsers[nextIndex];
-                                }
+                                int currentIndex = phUsers.indexWhere(
+                                  (u) => u.id == user.id,
+                                );
+                                int nextIndex =
+                                    (currentIndex + 1) >= phUsers.length
+                                        ? 0
+                                        : currentIndex + 1;
+                                user = phUsers[nextIndex];
                                 setState(() {
                                   init(showLoader: true);
                                 });
