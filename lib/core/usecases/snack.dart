@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
+import 'package:placeholder/core/usecases/contact_support.dart';
 import 'package:placeholder/core/usecases/nav.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-void snack(context, String message) {
+void snack(context, String message, {bool isError = true}) {
   showDialog(
       barrierColor: Colors.black.withOpacity(0.5),
       barrierDismissible: true,
@@ -26,11 +26,14 @@ void snack(context, String message) {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (isError)
                     Text(
                       "Something went wrong",
                       style: Constants.textStyles.title2,
                     ),
+                    if (isError)
                     Gap(10),
+                    if (isError)
                     Text(
                         """We've logged this error and the let the developers know.
                         
@@ -43,13 +46,16 @@ If this is not the first time you are getting this error, please contact support
                     Text(
                       message,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white, fontStyle: FontStyle.italic),
+                      style: isError ? TextStyle(
+                          color: Colors.white, fontStyle: FontStyle.italic) : TextStyle(
+                          color: Colors.white, fontStyle: FontStyle.italic, fontSize: 18),
                       maxLines: 4,
                     ),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        if (isError)
                         TextButton(
                             style: ButtonStyle(
                                 padding:
@@ -57,8 +63,7 @@ If this is not the first time you are getting this error, please contact support
                             onPressed: () {
                               Nav.pop(context);
                               // ignore: deprecated_member_use
-                              launchUrl(Uri.parse(
-                                  "mailto:placeholder-support@disnetdev.co.za?subject=Support Request&body=Hi!\nI am getting this following error: \n\n\n $message"));
+                              contactSupport(message);
                             },
                             child: Text("Contact Support")),
                         TextButton(
@@ -74,3 +79,5 @@ If this is not the first time you are getting this error, please contact support
             ),
           ));
 }
+
+

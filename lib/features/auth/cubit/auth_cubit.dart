@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:placeholder/main.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/p_h_user.dart';
 
@@ -64,6 +64,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> checkSub() async {
+    await Purchases.logIn(pb.authStore.record?.id ?? Uuid().v4());
     final CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
     final bool isPro = customerInfo.activeSubscriptions.isNotEmpty;

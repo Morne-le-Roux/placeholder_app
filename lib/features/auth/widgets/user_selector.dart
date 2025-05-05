@@ -72,7 +72,7 @@ class _UserSelectorState extends State<UserSelector> {
         ),
         AnimatedContainer(
           height: showDeleteIcon && widget.user != null ? 30 : 0,
-          duration: Duration(milliseconds: 200),
+          duration: Duration(milliseconds: 100),
           curve: Curves.easeInOut,
           child: FittedBox(
             child: loadingDelete
