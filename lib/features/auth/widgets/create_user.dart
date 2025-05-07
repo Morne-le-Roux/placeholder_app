@@ -74,6 +74,8 @@ class _CreateUserState extends State<CreateUser> {
                 ),
                 Expanded(child: SizedBox()),
                 Switch(
+                  inactiveTrackColor: Colors.black38,
+
                   value: phUser.isDashboard,
                   onChanged:
                       (value) => setState(

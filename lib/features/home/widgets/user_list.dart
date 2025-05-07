@@ -96,21 +96,22 @@ class _UserListState extends State<UserList> {
                 child: Column(
                   children: [
                     InkWell(
-                      onTap: !isDashboard
-                          ? () {
-                              int currentIndex = phUsers.indexWhere(
-                                (u) => u.id == user.id,
-                              );
-                              int nextIndex =
-                                  (currentIndex + 1) >= phUsers.length
-                                      ? 0
-                                      : currentIndex + 1;
-                              user = phUsers[nextIndex];
-                              setState(() {
-                                init(showLoader: true);
-                              });
-                            }
-                          : null,
+                      onTap:
+                          !isDashboard
+                              ? () {
+                                int currentIndex = phUsers.indexWhere(
+                                  (u) => u.id == user.id,
+                                );
+                                int nextIndex =
+                                    (currentIndex + 1) >= phUsers.length
+                                        ? 0
+                                        : currentIndex + 1;
+                                user = phUsers[nextIndex];
+                                setState(() {
+                                  init(showLoader: true);
+                                });
+                              }
+                              : null,
                       child: Container(
                         margin: EdgeInsets.all(4),
                         padding: EdgeInsets.all(10),
@@ -143,12 +144,12 @@ class _UserListState extends State<UserList> {
                                 color: const Color.fromARGB(255, 207, 207, 207),
                               ),
                             Expanded(child: SizedBox()),
-                            Text(
-                              "Next User",
-                              style: Constants.textStyles.description.copyWith(
-                                fontStyle: FontStyle.italic,
+                            if (!isDashboard)
+                              Text(
+                                "Next User",
+                                style: Constants.textStyles.description
+                                    .copyWith(fontStyle: FontStyle.italic),
                               ),
-                            ),
                           ],
                         ),
                       ),

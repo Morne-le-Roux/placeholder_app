@@ -41,19 +41,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        inputDecorationTheme: inputDecorationTheme,
-        primarySwatch: Colors.deepOrange,
-        primaryColor: Colors.deepOrange,
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(
-          color: Colors.white,
-          surfaceTintColor: Colors.transparent,
-        ),
-      ),
       darkTheme: ThemeData(
         primarySwatch: Colors.deepOrange,
         primaryColor: Colors.deepOrange,
+        colorScheme: ColorScheme.fromSeed(
+          surface: const Color.fromARGB(255, 25, 25, 25),
+
+          seedColor: Colors.deepOrange,
+          brightness: Brightness.light,
+        ),
         inputDecorationTheme: inputDecorationTheme,
         scaffoldBackgroundColor: Colors.black,
         appBarTheme: AppBarTheme(

@@ -72,98 +72,100 @@ class _ChooseUserState extends State<ChooseUser> {
                 Nav.pushAndPop(context, Login());
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: "contact",
-                child: Text(
-                  "Contact Support",
-                  style: Constants.textStyles.title3,
-                ),
-              ),
-              PopupMenuItem(
-                value: "logOut",
-                child: Text("Log Out", style: Constants.textStyles.title3),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  PopupMenuItem(
+                    value: "contact",
+                    child: Text(
+                      "Contact Support",
+                      style: Constants.textStyles.title3,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: "logOut",
+                    child: Text("Log Out", style: Constants.textStyles.title3),
+                  ),
+                ],
           ),
         ],
       ),
       body: SafeArea(
         child: Center(
-          child: loadingUsers
-              ? MainLoader()
-              : Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Expanded(child: SizedBox()),
-                      Wrap(
-                        spacing: 40,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          ...phUsers.map(
-                            (phu) => UserSelector(
-                              key: Key(phu.id),
-                              user: phu,
-                              onTap: () {
-                                authCubit.setPHUser(phu);
-                                if (authCubit.state.phUser != null) {
-                                  Nav.push(context, Dashboard());
+          child:
+              loadingUsers
+                  ? MainLoader()
+                  : Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Expanded(child: SizedBox()),
+                        Wrap(
+                          spacing: 40,
+                          alignment: WrapAlignment.center,
+                          children: [
+                            ...phUsers.map(
+                              (phu) => UserSelector(
+                                key: Key(phu.id),
+                                user: phu,
+                                onTap: () {
+                                  authCubit.setPHUser(phu);
+                                  if (authCubit.state.phUser != null) {
+                                    Nav.push(context, Dashboard());
+                                  }
+                                },
+                                onDelete:
+                                    () => setState(() => phUsers.remove(phu)),
+                              ),
+                            ),
+                            UserSelector(
+                              onDelete: () {},
+                              onTap: () async {
+                                bool canCreateNewUser = canCreateUser(
+                                  context,
+                                  currentUserCount: phUsers.length,
+                                );
+                                if (canCreateNewUser) {
+                                  await createNewUser(context);
                                 }
+                                init();
                               },
-                              onDelete: () =>
-                                  setState(() => phUsers.remove(phu)),
                             ),
-                          ),
-                          UserSelector(
-                            onDelete: () {},
-                            onTap: () async {
-                              bool canCreateNewUser = canCreateUser(
-                                context,
-                                currentUserCount: phUsers.length,
-                              );
-                              if (canCreateNewUser) {
-                                await createNewUser(context);
-                              }
-                              init();
-                            },
-                          ),
-                        ],
-                      ),
-                      Expanded(child: SizedBox()),
-                      BlocBuilder<AuthCubit, AuthState>(
-                        builder: (context, state) {
-                          if (state.isPro) {
-                            return Container();
-                          }
-                          return InkWell(
-                            onTap: () {
-                              Nav.push(context, Paywall());
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 1,
+                          ],
+                        ),
+                        Expanded(child: SizedBox()),
+                        BlocBuilder<AuthCubit, AuthState>(
+                          builder: (context, state) {
+                            if (state.isPro) {
+                              return Container();
+                            }
+                            return InkWell(
+                              onTap: () {
+                                Nav.push(context, Paywall());
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                authCubit.state.isPro
-                                    ? "Sub Active"
-                                    : "Go Pro to Unlock All Features",
-                                style: Constants.textStyles.title3.copyWith(
-                                  color: Colors.grey,
+                                child: Text(
+                                  authCubit.state.isPro
+                                      ? "Sub Active"
+                                      : "Go Pro to Unlock All Features",
+                                  style: Constants.textStyles.title3.copyWith(
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
         ),
       ),
     );

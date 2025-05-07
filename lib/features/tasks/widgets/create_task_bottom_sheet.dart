@@ -115,6 +115,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
                   ),
                   Switch(
                     value: task.recurring,
+                    inactiveTrackColor: Colors.black38,
                     onChanged:
                         (value) => setState(
                           () => task = task.copyWith(recurring: value),
