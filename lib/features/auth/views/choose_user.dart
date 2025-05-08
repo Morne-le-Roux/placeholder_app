@@ -90,83 +90,52 @@ class _ChooseUserState extends State<ChooseUser> {
         ],
       ),
       body: SafeArea(
-        child: Center(
-          child:
-              loadingUsers
-                  ? MainLoader()
-                  : Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Expanded(child: SizedBox()),
-                        Wrap(
-                          spacing: 40,
-                          alignment: WrapAlignment.center,
-                          children: [
-                            ...phUsers.map(
-                              (phu) => UserSelector(
-                                key: Key(phu.id),
-                                user: phu,
-                                onTap: () {
-                                  authCubit.setPHUser(phu);
-                                  if (authCubit.state.phUser != null) {
-                                    Nav.push(context, Dashboard());
-                                  }
-                                },
-                                onDelete:
-                                    () => setState(() => phUsers.remove(phu)),
-                              ),
-                            ),
-                            UserSelector(
-                              onDelete: () {},
-                              onTap: () async {
-                                bool canCreateNewUser = canCreateUser(
-                                  context,
-                                  currentUserCount: phUsers.length,
-                                );
-                                if (canCreateNewUser) {
-                                  await createNewUser(context);
-                                }
-                                init();
-                              },
-                            ),
-                          ],
-                        ),
-                        Expanded(child: SizedBox()),
-                        BlocBuilder<AuthCubit, AuthState>(
-                          builder: (context, state) {
-                            if (state.isPro) {
-                              return Container();
-                            }
-                            return InkWell(
+        child:
+            loadingUsers
+                ? MainLoader()
+                : Padding(
+                  padding: EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 40,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ...phUsers.map(
+                            (phu) => UserSelector(
+                              key: Key(phu.id),
+                              user: phu,
                               onTap: () {
-                                Nav.push(context, Paywall());
+                                authCubit.setPHUser(phu);
+                                if (authCubit.state.phUser != null) {
+                                  Nav.push(context, Dashboard());
+                                }
                               },
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  authCubit.state.isPro
-                                      ? "Sub Active"
-                                      : "Go Pro to Unlock All Features",
-                                  style: Constants.textStyles.title3.copyWith(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                              onDelete:
+                                  () => setState(() => phUsers.remove(phu)),
+                            ),
+                          ),
+                          UserSelector(
+                            onDelete: () {},
+                            onTap: () async {
+                              bool canCreateNewUser = canCreateUser(
+                                context,
+                                currentUserCount: phUsers.length,
+                              );
+                              if (canCreateNewUser) {
+                                await createNewUser(context);
+                              }
+                              init();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-        ),
+                ),
       ),
     );
   }
