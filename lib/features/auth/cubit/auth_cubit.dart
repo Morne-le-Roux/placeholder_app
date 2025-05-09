@@ -21,13 +21,15 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> register(String email, String password) async {
     try {
-      await pb.collection("users").create(
-        body: {
-          "email": email,
-          "password": password,
-          "passwordConfirm": password,
-        },
-      );
+      await pb
+          .collection("users")
+          .create(
+            body: {
+              "email": email,
+              "password": password,
+              "passwordConfirm": password,
+            },
+          );
     } catch (e) {
       rethrow;
     }
@@ -54,9 +56,20 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> createUser(PHUser phUser) async {
     try {
-      final response = await pb.collection("ph_users").create(
-            body: phUser.toMap(),
-          );
+      final response = await pb
+          .collection("ph_users")
+          .create(body: phUser.toMap());
+      emit(state.copyWith(phUser: PHUser.fromMap(response.toJson())));
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateUser(PHUser phUser) async {
+    try {
+      final response = await pb
+          .collection("ph_users")
+          .update(phUser.id, body: phUser.toMap());
       emit(state.copyWith(phUser: PHUser.fromMap(response.toJson())));
     } catch (e) {
       rethrow;
@@ -70,20 +83,14 @@ class AuthCubit extends Cubit<AuthState> {
     final bool isPro = customerInfo.activeSubscriptions.isNotEmpty;
 
     if (isPro) {
-      emit(state.copyWith(
-        isPro: isPro,
-      ));
+      emit(state.copyWith(isPro: isPro));
     } else {
-      emit(state.copyWith(
-        isPro: false,
-      ));
+      emit(state.copyWith(isPro: false));
     }
   }
 
   void setPro() {
-    emit(state.copyWith(
-      isPro: true,
-    ));
+    emit(state.copyWith(isPro: true));
   }
 
   Future<void> getSubscriptions() async {

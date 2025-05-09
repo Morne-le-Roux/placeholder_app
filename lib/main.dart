@@ -46,7 +46,6 @@ class MainApp extends StatelessWidget {
         primaryColor: Colors.deepOrange,
         colorScheme: ColorScheme.fromSeed(
           surface: const Color.fromARGB(255, 25, 25, 25),
-
           seedColor: Colors.deepOrange,
           brightness: Brightness.light,
         ),

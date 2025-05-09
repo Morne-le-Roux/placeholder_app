@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:placeholder/core/usecases/pick_image.dart';
+import 'package:placeholder/core/usecases/upload_image.dart';
 import 'package:placeholder/core/widgets/buttons/large_rounded_button.dart';
+import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:placeholder/main.dart';
 import 'package:placeholder/core/usecases/nav.dart';
@@ -12,7 +17,9 @@ import '../../../core/constants/constants.dart';
 import '../cubit/auth_cubit.dart';
 
 class CreateUser extends StatefulWidget {
-  const CreateUser({super.key});
+  const CreateUser({super.key, this.user});
+
+  final PHUser? user;
 
   @override
   State<CreateUser> createState() => _CreateUserState();
@@ -21,18 +28,21 @@ class CreateUser extends StatefulWidget {
 class _CreateUserState extends State<CreateUser> {
   late PHUser phUser;
   bool loading = false;
+  bool loadingAvatar = false;
 
   AuthCubit get authCubit => context.read<AuthCubit>();
 
   @override
   void initState() {
-    phUser = PHUser(
-      id: Uuid().v4().replaceAll("-", ""),
-      name: "",
-      avatarURL: null,
-      isDashboard: false,
-      accountHolderID: pb.authStore.record?.id ?? "",
-    );
+    phUser =
+        widget.user ??
+        PHUser(
+          id: Uuid().v4().replaceAll("-", ""),
+          name: "",
+          avatarURL: null,
+          isDashboard: false,
+          accountHolderID: pb.authStore.record?.id ?? "",
+        );
     super.initState();
   }
 
@@ -84,14 +94,62 @@ class _CreateUserState extends State<CreateUser> {
                 ),
               ],
             ),
-            Gap(20),
+            InkWell(
+              onTap: () async {
+                File? file = await pickImage(context);
+                if (file != null) {
+                  setState(() => loadingAvatar = true);
+                  phUser = phUser.copyWith(avatarURL: await uploadImage(file));
+                  setState(() => loadingAvatar = false);
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.deepOrange.withAlpha(100),
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color.fromARGB(255, 0, 0, 0),
+                  ),
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color.fromARGB(255, 25, 25, 25),
+                    ),
+                    child: FittedBox(
+                      child:
+                          loadingAvatar
+                              ? MainLoader()
+                              : phUser.avatarURL == null
+                              ? Icon(
+                                Icons.person,
+                                color: const Color.fromARGB(255, 45, 45, 45),
+                              )
+                              : Image.network(phUser.avatarURL!),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Gap(40),
+
             LargeRoundedButton(
-              text: "Create User",
+              text: widget.user == null ? "Create User" : "Update User",
               onPressed: () async {
                 try {
                   FocusScope.of(context).unfocus();
                   setState(() => loading = true);
-                  await authCubit.createUser(phUser);
+                  if (widget.user == null) {
+                    await authCubit.createUser(phUser);
+                  } else {
+                    await authCubit.updateUser(phUser);
+                  }
                   setState(() => loading = false);
                   Nav.pop(context);
                 } catch (e) {

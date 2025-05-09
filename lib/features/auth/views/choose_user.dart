@@ -30,6 +30,7 @@ class _ChooseUserState extends State<ChooseUser> {
 
   bool loadingUsers = false;
   List<PHUser> phUsers = [];
+  bool showEdit = false;
 
   @override
   void initState() {
@@ -93,48 +94,65 @@ class _ChooseUserState extends State<ChooseUser> {
         child:
             loadingUsers
                 ? MainLoader()
-                : Padding(
-                  padding: EdgeInsets.all(20),
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 40,
-                        alignment: WrapAlignment.center,
-                        children: [
-                          ...phUsers.map(
-                            (phu) => UserSelector(
-                              key: Key(phu.id),
-                              user: phu,
-                              onTap: () {
-                                authCubit.setPHUser(phu);
-                                if (authCubit.state.phUser != null) {
-                                  Nav.push(context, Dashboard());
-                                }
-                              },
-                              onDelete:
-                                  () => setState(() => phUsers.remove(phu)),
-                            ),
+                : Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(
+                        child: SingleChildScrollView(
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 40,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              ...phUsers.map(
+                                (phu) => UserSelector(
+                                  key: Key(phu.id),
+                                  user: phu,
+                                  showEdit: showEdit,
+                                  onTap: () async {
+                                    if (showEdit) {
+                                      await createNewUser(context, user: phu);
+                                      init();
+                                      return;
+                                    } else {
+                                      authCubit.setPHUser(phu);
+                                      if (authCubit.state.phUser != null) {
+                                        Nav.push(context, Dashboard());
+                                      }
+                                    }
+                                  },
+                                  onDelete:
+                                      () => setState(() => phUsers.remove(phu)),
+                                ),
+                              ),
+                              UserSelector(
+                                onDelete: () {},
+                                onTap: () async {
+                                  bool canCreateNewUser = canCreateUser(
+                                    context,
+                                    currentUserCount: phUsers.length,
+                                  );
+                                  if (canCreateNewUser) {
+                                    await createNewUser(context);
+                                  }
+                                  init();
+                                },
+                              ),
+                            ],
                           ),
-                          UserSelector(
-                            onDelete: () {},
-                            onTap: () async {
-                              bool canCreateNewUser = canCreateUser(
-                                context,
-                                currentUserCount: phUsers.length,
-                              );
-                              if (canCreateNewUser) {
-                                await createNewUser(context);
-                              }
-                              init();
-                            },
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                    Positioned(
+                      right: 20,
+                      top: 20,
+                      child: IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () => setState(() => showEdit = !showEdit),
+                      ),
+                    ),
+                  ],
                 ),
       ),
     );

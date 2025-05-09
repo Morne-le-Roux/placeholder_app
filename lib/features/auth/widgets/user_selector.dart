@@ -7,33 +7,29 @@ import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
 
-class UserSelector extends StatefulWidget {
+class UserSelector extends StatelessWidget {
   const UserSelector({
     super.key,
     this.user,
     required this.onTap,
     required this.onDelete,
+    this.showEdit = false,
+    this.loading = false,
   });
 
   final PHUser? user;
   final VoidCallback onTap;
   final VoidCallback onDelete;
+  final bool showEdit;
+  final bool loading;
 
-  @override
-  State<UserSelector> createState() => _UserSelectorState();
-}
-
-class _UserSelectorState extends State<UserSelector> {
-  bool showDeleteIcon = false;
-  bool loadingDelete = false;
   @override
   Widget build(BuildContext context) {
     return Stack(
       alignment: Alignment.topRight,
       children: [
         GestureDetector(
-          onTap: widget.onTap,
-          onLongPress: () => setState(() => showDeleteIcon = !showDeleteIcon),
+          onTap: onTap,
           child: Column(
             children: [
               Container(
@@ -50,9 +46,7 @@ class _UserSelectorState extends State<UserSelector> {
                   ),
                   child: Container(
                     padding:
-                        widget.user?.avatarURL == null
-                            ? EdgeInsets.all(20)
-                            : null,
+                        user?.avatarURL == null ? EdgeInsets.all(20) : null,
                     decoration: BoxDecoration(
                       color: const Color.fromARGB(255, 39, 39, 39),
                       shape: BoxShape.circle,
@@ -60,11 +54,41 @@ class _UserSelectorState extends State<UserSelector> {
                     height: 100,
                     width: 100,
                     child: FittedBox(
-                      child: Icon(
-                        widget.user != null
-                            ? Icons.person_rounded
-                            : Icons.add_rounded,
-                        color: const Color.fromARGB(255, 73, 73, 73),
+                      child: Builder(
+                        builder: (context) {
+                          if (user != null) {
+                            return AnimatedSwitcher(
+                              duration: Duration(milliseconds: 200),
+                              child:
+                                  showEdit
+                                      ? Padding(
+                                        padding: EdgeInsets.all(5),
+                                        child: Icon(
+                                          Icons.edit,
+                                          color: const Color.fromARGB(
+                                            255,
+                                            73,
+                                            73,
+                                            73,
+                                          ),
+                                        ),
+                                      )
+                                      : Icon(
+                                        Icons.person_rounded,
+                                        color: const Color.fromARGB(
+                                          255,
+                                          73,
+                                          73,
+                                          73,
+                                        ),
+                                      ),
+                            );
+                          }
+                          return Icon(
+                            Icons.add_rounded,
+                            color: const Color.fromARGB(255, 73, 73, 73),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -72,7 +96,7 @@ class _UserSelectorState extends State<UserSelector> {
               ),
               Gap(20),
               Text(
-                widget.user?.name ?? "Add A User",
+                user?.name ?? "Add A User",
                 style: Constants.textStyles.title2.copyWith(
                   color: const Color.fromARGB(255, 153, 153, 153),
                 ),
@@ -82,12 +106,12 @@ class _UserSelectorState extends State<UserSelector> {
           ),
         ),
         AnimatedContainer(
-          height: showDeleteIcon && widget.user != null ? 30 : 0,
+          height: showEdit && user != null ? 30 : 0,
           duration: Duration(milliseconds: 100),
           curve: Curves.easeInOut,
           child: FittedBox(
             child:
-                loadingDelete
+                loading
                     ? MainLoader()
                     : GestureDetector(
                       onTap: () async {
@@ -134,12 +158,10 @@ class _UserSelectorState extends State<UserSelector> {
                               ),
                         );
                         if (delete) {
-                          setState(() => loadingDelete = true);
                           await context.read<AuthCubit>().deleteUser(
-                            widget.user?.id ?? "",
+                            user?.id ?? "",
                           );
-                          setState(() => loadingDelete = false);
-                          widget.onDelete.call();
+                          onDelete.call();
                         }
                       },
                       child: Icon(
