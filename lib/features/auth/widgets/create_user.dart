@@ -96,11 +96,18 @@ class _CreateUserState extends State<CreateUser> {
             ),
             InkWell(
               onTap: () async {
-                File? file = await pickImage(context);
-                if (file != null) {
-                  setState(() => loadingAvatar = true);
-                  phUser = phUser.copyWith(avatarURL: await uploadImage(file));
+                try {
+                  File? file = await pickImage(context);
+                  if (file != null) {
+                    setState(() => loadingAvatar = true);
+                    phUser = phUser.copyWith(
+                      avatarURL: await uploadImage(file, userId: phUser.id),
+                    );
+                    setState(() => loadingAvatar = false);
+                  }
+                } catch (e) {
                   setState(() => loadingAvatar = false);
+                  snack(context, e.toString());
                 }
               },
               child: Container(
@@ -122,16 +129,21 @@ class _CreateUserState extends State<CreateUser> {
                       shape: BoxShape.circle,
                       color: const Color.fromARGB(255, 25, 25, 25),
                     ),
-                    child: FittedBox(
-                      child:
-                          loadingAvatar
-                              ? MainLoader()
-                              : phUser.avatarURL == null
-                              ? Icon(
-                                Icons.person,
-                                color: const Color.fromARGB(255, 45, 45, 45),
-                              )
-                              : Image.network(phUser.avatarURL!),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(1000),
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child:
+                            loadingAvatar
+                                ? MainLoader()
+                                : phUser.avatarURL == null ||
+                                    phUser.avatarURL == ""
+                                ? Icon(
+                                  Icons.person,
+                                  color: const Color.fromARGB(255, 45, 45, 45),
+                                )
+                                : Image.network(phUser.avatarURL!),
+                      ),
                     ),
                   ),
                 ),

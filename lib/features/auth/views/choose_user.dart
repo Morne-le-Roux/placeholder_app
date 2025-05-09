@@ -2,18 +2,20 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/contact_support.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:placeholder/features/auth/usecases/can_create_user.dart';
+import 'package:placeholder/features/auth/usecases/show_release_notes.dart';
 import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/auth/widgets/user_selector.dart';
 import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
-import 'package:placeholder/features/payment/views/paywall.dart';
+import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
 
 import '../usecases/create_new_user.dart';
 
@@ -26,6 +28,7 @@ class ChooseUser extends StatefulWidget {
 
 class _ChooseUserState extends State<ChooseUser> {
   AuthCubit get authCubit => context.read<AuthCubit>();
+  ReleaseNotesCubit get releaseNotesCubit => context.read<ReleaseNotesCubit>();
   ScrollController scrollController = ScrollController();
 
   bool loadingUsers = false;
@@ -35,6 +38,7 @@ class _ChooseUserState extends State<ChooseUser> {
   @override
   void initState() {
     init();
+    checkReleaseNotes(context);
     super.initState();
   }
 
@@ -68,7 +72,7 @@ class _ChooseUserState extends State<ChooseUser> {
             color: const Color.fromARGB(255, 26, 26, 26),
             onSelected: (value) {
               if (value == "contact") {
-                contactSupport("");
+                contactSupport("", isError: false);
               } else if (value == "logOut") {
                 Nav.pushAndPop(context, Login());
               }

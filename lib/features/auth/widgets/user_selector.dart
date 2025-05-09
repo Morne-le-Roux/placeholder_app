@@ -45,6 +45,7 @@ class UserSelector extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Container(
+                    clipBehavior: Clip.hardEdge,
                     padding:
                         user?.avatarURL == null ? EdgeInsets.all(20) : null,
                     decoration: BoxDecoration(
@@ -54,6 +55,7 @@ class UserSelector extends StatelessWidget {
                     height: 100,
                     width: 100,
                     child: FittedBox(
+                      fit: BoxFit.cover,
                       child: Builder(
                         builder: (context) {
                           if (user != null) {
@@ -73,7 +75,9 @@ class UserSelector extends StatelessWidget {
                                           ),
                                         ),
                                       )
-                                      : Icon(
+                                      : user?.avatarURL == null ||
+                                          user?.avatarURL == ""
+                                      ? Icon(
                                         Icons.person_rounded,
                                         color: const Color.fromARGB(
                                           255,
@@ -81,6 +85,12 @@ class UserSelector extends StatelessWidget {
                                           73,
                                           73,
                                         ),
+                                      )
+                                      : ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                          1000,
+                                        ),
+                                        child: Image.network(user!.avatarURL!),
                                       ),
                             );
                           }

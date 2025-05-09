@@ -9,72 +9,83 @@ import 'package:uuid/uuid.dart'; // Import Material package for UI components
 Future<File?> pickImage(BuildContext context) async {
   File? filePicked;
   await showModalBottomSheet(
-    backgroundColor: Colors.black,
+    backgroundColor: const Color.fromARGB(255, 25, 25, 25),
     context: context,
     builder: (BuildContext context) {
-      return Container(
-        padding: const EdgeInsets.only(top: 20, bottom: 40),
-        height: MediaQuery.of(context).size.height / 4,
-        child: Column(
-          children: [
-            Text("Pick an Image", style: Constants.textStyles.title2),
-            const Expanded(child: SizedBox()),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        XFile? pickedImage = await _pickAndCompress(
-                          ImageSource.gallery,
-                        );
-                        if (pickedImage != null && context.mounted) {
-                          filePicked = File(pickedImage.path);
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.deepOrange),
+      return SafeArea(
+        child: Container(
+          padding: const EdgeInsets.only(top: 20, bottom: 40),
+          height: MediaQuery.of(context).size.height / 4,
+          child: Column(
+            children: [
+              Text("Pick an Image", style: Constants.textStyles.title3),
+              const Expanded(child: SizedBox()),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          XFile? pickedImage = await _pickAndCompress(
+                            ImageSource.gallery,
+                          );
+                          if (pickedImage != null && context.mounted) {
+                            filePicked = File(pickedImage.path);
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.deepOrange),
+                          ),
+                          child: const Icon(Icons.photo, color: Colors.white),
                         ),
-                        child: const Icon(Icons.photo),
                       ),
-                    ),
-                    const Text("Pick from Gallery"),
-                  ],
-                ),
-                Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        XFile? pickedImage = await _pickAndCompress(
-                          ImageSource.camera,
-                        );
-                        if (pickedImage != null && context.mounted) {
-                          filePicked = File(pickedImage.path);
-                          Navigator.of(context).pop();
-                        }
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.deepOrange),
+                      const Text(
+                        "Pick from Gallery",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          XFile? pickedImage = await _pickAndCompress(
+                            ImageSource.camera,
+                          );
+                          if (pickedImage != null && context.mounted) {
+                            filePicked = File(pickedImage.path);
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.deepOrange),
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                          ),
                         ),
-                        child: const Icon(Icons.camera_alt),
                       ),
-                    ),
-                    const Text("Take a photo"),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                      const Text(
+                        "Take a photo",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       );
     },
