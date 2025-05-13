@@ -1,3 +1,29 @@
 {
-  "cSpell.words": ["dotenv", "paautomatic", "phusers", "POCKETBASE", "usecases"]
+  "cSpell.words": [
+    "dotenv",
+    "paautomatic",
+    "phusers",
+    "POCKETBASE",
+    "usecases"
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#802500",
+    "activityBar.background": "#802500",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#000000",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#802500",
+    "statusBar.background": "#4d1600",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#802500",
+    "statusBarItem.remoteBackground": "#4d1600",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#4d1600",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#4d160099",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#4d1600"
 }

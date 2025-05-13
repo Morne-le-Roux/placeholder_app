@@ -79,7 +79,9 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> checkSub() async {
-    await Purchases.logIn(pb.authStore.record?.id ?? Uuid().v4());
+    log(pb.authStore.record?.data["email"] ?? "");
+    await Purchases.logIn(pb.authStore.record?.data["email"] ?? "");
+
     final CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
     final bool isPro = customerInfo.activeSubscriptions.isNotEmpty;

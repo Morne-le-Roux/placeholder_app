@@ -16,6 +16,8 @@ import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
+import 'package:placeholder/main.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../usecases/create_new_user.dart';
 
@@ -74,6 +76,8 @@ class _ChooseUserState extends State<ChooseUser> {
               if (value == "contact") {
                 contactSupport("", isError: false);
               } else if (value == "logOut") {
+                pb.authStore.clear();
+                Purchases.logOut();
                 Nav.pushAndPop(context, Login());
               }
             },
