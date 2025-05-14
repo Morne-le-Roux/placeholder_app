@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder/core/usecases/is_portrait.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
+import 'package:placeholder/features/auth/usecases/refresh_auth.dart';
 import 'package:placeholder/features/home/widgets/user_list.dart';
 import 'package:placeholder/core/usecases/snack.dart';
+import 'package:placeholder/main.dart';
 
 import '../../../core/constants/constants.dart';
 import '../../auth/cubit/auth_cubit.dart';
@@ -22,6 +26,7 @@ class _DashboardState extends State<Dashboard> {
   bool get isDashboard => authCubit.state.phUser?.isDashboard ?? false;
   List<PHUser> users = [];
   bool isLoading = false;
+  Timer? _authRefreshTimer;
 
   init() async {
     try {
@@ -38,7 +43,16 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     init();
+    _authRefreshTimer = Timer.periodic(const Duration(days: 1), (timer) {
+      refreshAuth();
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _authRefreshTimer?.cancel();
+    super.dispose();
   }
 
   @override

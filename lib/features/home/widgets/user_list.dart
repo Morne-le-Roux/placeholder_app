@@ -57,7 +57,7 @@ class _UserListState extends State<UserList> {
     user = widget.user;
     init(showLoader: true);
     if (isDashboard) {
-      _refreshTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
         init(showLoader: false);
       });
     }

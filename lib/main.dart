@@ -10,7 +10,6 @@ import 'package:placeholder/core/usecases/init_sentry.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
-import 'package:placeholder/features/payment/usecases/init_rc.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
 import 'package:pocketbase/pocketbase.dart';
 
@@ -34,7 +33,6 @@ void main() async {
   if (kDebugMode) await dotenv.load(fileName: "staging.env");
   if (!kDebugMode) await dotenv.load(fileName: "prod.env");
   await initPB();
-  await initRC();
 
   await initSentry(
     mainApp: MultiBlocProvider(
@@ -73,7 +71,8 @@ class MainApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       home: Builder(
         builder: (context) {
-          if (pb.authStore.record?.id.isNotEmpty ?? false) {
+          if (pb.authStore.isValid) {
+            pb.collection("users").authRefresh();
             return ChooseUser();
           } else {
             return Login();

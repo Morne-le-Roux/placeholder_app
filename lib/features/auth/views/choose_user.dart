@@ -15,6 +15,7 @@ import 'package:placeholder/features/auth/widgets/user_selector.dart';
 import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
+import 'package:placeholder/features/payment/usecases/init_rc.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
 import 'package:placeholder/main.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -54,6 +55,7 @@ class _ChooseUserState extends State<ChooseUser> {
     try {
       setState(() => loadingUsers = true);
       phUsers = await authCubit.fetchUsers();
+      await initRC(pb.authStore.record!.data['email'] ?? "");
       await authCubit.checkSub();
       phUsers = await authCubit.fetchUsers();
     } catch (e) {

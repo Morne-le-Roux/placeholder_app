@@ -19,10 +19,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> updateTask(Task task) async {
     try {
-      await pb.collection("tasks").update(
-            task.id,
-            body: task.toMap(),
-          );
+      await pb.collection("tasks").update(task.id, body: task.toMap());
     } catch (e) {
       rethrow;
     }
@@ -30,10 +27,9 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> deleteTask(Task task) async {
     try {
-      await pb.collection("tasks").update(
-            task.id,
-            body: task.copyWith(deleted: true).toMap(),
-          );
+      await pb
+          .collection("tasks")
+          .update(task.id, body: task.copyWith(deleted: true).toMap());
     } catch (e) {
       rethrow;
     }
