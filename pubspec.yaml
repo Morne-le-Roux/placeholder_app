@@ -1,7 +1,7 @@
 name: placeholder
 description: "A new Flutter project."
 publish_to: "none"
-version: 0.9.0+26
+version: 0.10.0+27
 
 environment:
   sdk: ^3.7.2
@@ -29,6 +29,7 @@ dependencies:
   http: ^1.4.0
   package_info_plus: ^8.3.0
   hydrated_bloc: ^10.0.0
+  gradient_borders: ^1.0.1
 
 dev_dependencies:
   flutter_lints: ^5.0.0
