@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gap/gap.dart';
-import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/get_random_colors.dart';
 import 'package:placeholder/features/tasks/models/task.dart';
 import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
+import 'package:placeholder/features/tasks/usecases/was_task_done_yesterday.dart';
 
 class TaskCard extends StatefulWidget {
   const TaskCard({
@@ -30,12 +30,20 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Color> colors = getRandomColors();
-    final Color borderColor = colors.first;
+    List<Color> colors = getRandomColors();
+    Color borderColor = colors.first;
     final Color bgColor = colors.first;
     // Calculate luminance to decide text color
     final bool useWhiteText = bgColor.computeLuminance() < 0.5;
     final Color textColor = useWhiteText ? Colors.white : Colors.black;
+    if (!wasTaskDoneYesterday(widget.task)) {
+      borderColor = Colors.deepOrange.withAlpha(100);
+      colors = [
+        Colors.deepOrange.withAlpha(100),
+        Colors.deepOrange.withAlpha(0),
+      ];
+    }
+
     final List<Widget> actions = [
       CustomSlidableAction(
         onPressed: (context) => _handleComplete(delete: true),
@@ -214,7 +222,9 @@ class _TaskCardState extends State<TaskCard> {
                             ),
                             if (widget.task.recurring)
                               Text(
-                                "Daily",
+                                wasTaskDoneYesterday(widget.task)
+                                    ? "Daily"
+                                    : "Task not done yesterday",
                                 style: Constants.textStyles.data.copyWith(
                                   color: textColor.withOpacity(0.7),
                                 ),

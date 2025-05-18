@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:placeholder/core/widgets/avatar.dart';
@@ -96,6 +97,8 @@ class _UserListState extends State<UserList> {
                 child: Column(
                   children: [
                     InkWell(
+                      splashColor: Colors.deepOrange.withAlpha(100),
+                      borderRadius: BorderRadius.circular(20),
                       onTap:
                           !isDashboard
                               ? () {
@@ -116,6 +119,10 @@ class _UserListState extends State<UserList> {
                         margin: EdgeInsets.all(4),
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color.fromARGB(255, 36, 36, 36),
+                            width: 3,
+                          ),
                           gradient: LinearGradient(
                             colors: [
                               const Color.fromARGB(255, 41, 41, 41),
@@ -138,15 +145,12 @@ class _UserListState extends State<UserList> {
                               ),
                             ),
                             Gap(10),
-                            if (!isDashboard)
-                              Icon(
-                                Icons.keyboard_arrow_right_rounded,
-                                color: const Color.fromARGB(255, 207, 207, 207),
-                              ),
+
                             Expanded(child: SizedBox()),
+
                             if (!isDashboard)
                               Text(
-                                "Next User",
+                                "Next User >>",
                                 style: Constants.textStyles.description
                                     .copyWith(fontStyle: FontStyle.italic),
                               ),
@@ -156,31 +160,40 @@ class _UserListState extends State<UserList> {
                     ),
                     Gap(10),
                     ...tasks.map(
-                      (task) => TaskCard(
-                        key: Key(task.id),
-                        task: task,
-                        onDone: () {
-                          log("onDone ${task.id}");
-                          setState(
-                            () => tasks.removeWhere((t) => t.id == task.id),
-                          );
-                          if (task.recurring) {
-                            taskCubit.updateTask(
-                              task.copyWith(
-                                lastDone: DateTime.now().toString(),
-                              ),
+                      (task) => Animate(
+                        effects: [
+                          FadeEffect(
+                            duration: Duration(
+                              milliseconds: 200 + (tasks.indexOf(task) * 100),
+                            ),
+                          ),
+                        ],
+                        child: TaskCard(
+                          key: Key(task.id),
+                          task: task,
+                          onDone: () {
+                            log("onDone ${task.id}");
+                            setState(
+                              () => tasks.removeWhere((t) => t.id == task.id),
                             );
-                          } else {
+                            if (task.recurring) {
+                              taskCubit.updateTask(
+                                task.copyWith(
+                                  lastDone: DateTime.now().toString(),
+                                ),
+                              );
+                            } else {
+                              taskCubit.deleteTask(task);
+                            }
+                          },
+                          onDismissed: () {
+                            log("onDismissed ${task.id}");
+                            setState(
+                              () => tasks.removeWhere((t) => t.id == task.id),
+                            );
                             taskCubit.deleteTask(task);
-                          }
-                        },
-                        onDismissed: () {
-                          log("onDismissed ${task.id}");
-                          setState(
-                            () => tasks.removeWhere((t) => t.id == task.id),
-                          );
-                          taskCubit.deleteTask(task);
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ],
