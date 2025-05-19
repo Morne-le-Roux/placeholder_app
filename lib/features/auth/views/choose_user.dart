@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/contact_support.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';

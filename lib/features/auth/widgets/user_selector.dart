@@ -32,78 +32,92 @@ class UserSelector extends StatelessWidget {
           onTap: onTap,
           child: Column(
             children: [
-              Container(
-                padding: EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Constants.colors.primary.withAlpha(100),
-                  shape: BoxShape.circle,
-                ),
-                child: Container(
+              if (!(user?.isDashboard ?? false))
+                Container(
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Constants.colors.primary.withAlpha(100),
                     shape: BoxShape.circle,
                   ),
                   child: Container(
-                    clipBehavior: Clip.hardEdge,
-                    padding:
-                        user?.avatarURL == null ? EdgeInsets.all(20) : null,
+                    padding: EdgeInsets.all(2),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 39, 39, 39),
+                      color: Colors.black,
                       shape: BoxShape.circle,
                     ),
-                    height: 100,
-                    width: 100,
-                    child: FittedBox(
-                      fit: BoxFit.cover,
-                      child: Builder(
-                        builder: (context) {
-                          if (user != null) {
-                            return AnimatedSwitcher(
-                              duration: Duration(milliseconds: 200),
-                              child:
-                                  showEdit
-                                      ? Padding(
-                                        padding: EdgeInsets.all(5),
-                                        child: Icon(
-                                          Icons.edit,
+                    child: Container(
+                      clipBehavior: Clip.hardEdge,
+                      padding:
+                          user?.avatarURL == null ? EdgeInsets.all(20) : null,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 39, 39, 39),
+                        shape: BoxShape.circle,
+                      ),
+                      height: 100,
+                      width: 100,
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: Builder(
+                          builder: (context) {
+                            if (user != null) {
+                              return AnimatedSwitcher(
+                                duration: Duration(milliseconds: 200),
+                                child:
+                                    showEdit
+                                        ? Padding(
+                                          padding: EdgeInsets.all(5),
+                                          child: Icon(
+                                            Icons.edit,
+                                            color: const Color.fromARGB(
+                                              255,
+                                              73,
+                                              73,
+                                              73,
+                                            ),
+                                          ),
+                                        )
+                                        : user?.avatarURL == null ||
+                                            user?.avatarURL == ""
+                                        ? Icon(
+                                          Icons.person_rounded,
                                           color: const Color.fromARGB(
                                             255,
                                             73,
                                             73,
                                             73,
                                           ),
+                                        )
+                                        : ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            1000,
+                                          ),
+                                          child: Image.network(
+                                            user!.avatarURL!,
+                                          ),
                                         ),
-                                      )
-                                      : user?.avatarURL == null ||
-                                          user?.avatarURL == ""
-                                      ? Icon(
-                                        Icons.person_rounded,
-                                        color: const Color.fromARGB(
-                                          255,
-                                          73,
-                                          73,
-                                          73,
-                                        ),
-                                      )
-                                      : ClipRRect(
-                                        borderRadius: BorderRadius.circular(
-                                          1000,
-                                        ),
-                                        child: Image.network(user!.avatarURL!),
-                                      ),
+                              );
+                            }
+                            return Icon(
+                              Icons.add_rounded,
+                              color: const Color.fromARGB(255, 73, 73, 73),
                             );
-                          }
-                          return Icon(
-                            Icons.add_rounded,
-                            color: const Color.fromARGB(255, 73, 73, 73),
-                          );
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ),
+                )
+              else
+                SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: FittedBox(
+                    child: Icon(
+                      Symbols.dashboard_2,
+                      color: Colors.grey.withAlpha(100),
+                    ),
+                  ),
                 ),
-              ),
               Gap(20),
               Text(
                 user?.name ?? "Add A User",
