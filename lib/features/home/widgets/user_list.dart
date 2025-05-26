@@ -38,7 +38,8 @@ class _UserListState extends State<UserList> {
   List<Task> tasks = [];
   late PHUser user;
   List<PHUser> phUsers = [];
-
+  bool isScrolled = false;
+  final scrollController = ScrollController();
   Future<void> init({bool showLoader = false}) async {
     try {
       setState(() => isLoading = showLoader);
@@ -57,6 +58,9 @@ class _UserListState extends State<UserList> {
   void initState() {
     user = widget.user;
     init(showLoader: true);
+    scrollController.addListener(() {
+      setState(() => isScrolled = scrollController.position.pixels > 10);
+    });
     if (isDashboard) {
       _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
         init(showLoader: false);
@@ -68,6 +72,7 @@ class _UserListState extends State<UserList> {
   @override
   void dispose() {
     _refreshTimer?.cancel();
+    scrollController.dispose();
     super.dispose();
   }
 
@@ -75,6 +80,7 @@ class _UserListState extends State<UserList> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Stack(
+        alignment: Alignment.topCenter,
         children: [
           RefreshIndicator(
             onRefresh: () async {
@@ -83,19 +89,14 @@ class _UserListState extends State<UserList> {
             child: Container(
               height: MediaQuery.of(context).size.height,
               constraints: BoxConstraints(minWidth: 100),
-              padding: EdgeInsets.only(top: 10, right: 5, left: 5),
-              decoration: BoxDecoration(
-                border: Border(
-                  right: BorderSide(
-                    width: 0.5,
-                    color: const Color.fromARGB(255, 36, 36, 36),
-                  ),
-                ),
-              ),
+              padding: EdgeInsets.only(right: 5, left: 5),
+
               child: SingleChildScrollView(
+                controller: scrollController,
                 physics: AlwaysScrollableScrollPhysics(),
                 child: Column(
                   children: [
+                    Gap(10),
                     InkWell(
                       splashColor: Colors.deepOrange.withAlpha(100),
                       borderRadius: BorderRadius.circular(20),
@@ -223,6 +224,26 @@ class _UserListState extends State<UserList> {
             ),
           ),
           if (isLoading) Center(child: MainLoader()),
+
+          AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.ease,
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              gradient:
+                  isScrolled
+                      ? LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withAlpha(100),
+                          Colors.black.withAlpha(0),
+                        ],
+                      )
+                      : null,
+            ),
+          ),
         ],
       ),
     );

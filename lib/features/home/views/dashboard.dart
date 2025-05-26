@@ -8,7 +8,6 @@ import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/usecases/refresh_auth.dart';
 import 'package:placeholder/features/home/widgets/user_list.dart';
 import 'package:placeholder/core/usecases/snack.dart';
-import 'package:placeholder/main.dart';
 
 import '../../../core/constants/constants.dart';
 import '../../auth/cubit/auth_cubit.dart';
@@ -57,79 +56,98 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          "Today",
-          style: Constants.textStyles.title2.copyWith(color: Colors.white),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: () => Nav.pop(context),
-            child: Text(
-              "User: ${authCubit.state.phUser?.name}    ",
-              style: Constants.textStyles.data.copyWith(color: Colors.white),
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            gradient: RadialGradient(
+              center: Alignment.topCenter,
+              radius: 1.5,
+              colors: [Colors.deepOrange, Colors.deepOrange.withAlpha(0)],
             ),
           ),
-        ],
-        automaticallyImplyLeading: false,
-      ),
-      body:
-          isLoading
-              ? Center(child: MainLoader())
-              : Builder(
-                builder: (context) {
-                  bool isOnlyDashboard = users.isEmpty && isDashboard;
-
-                  if (isPortrait(context) && isDashboard) {
-                    Future.delayed(Duration(seconds: 1), () {
-                      snack(
-                        context,
-                        "This user is a Dashboard user, which is best viewed in landscape mode, on larger displays.",
-                        isError: false,
-                      );
-                    });
-                  }
-
-                  if (isOnlyDashboard) {
-                    return Container(
-                      alignment: Alignment.center,
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Text(
-                          "No users found, create some to get started.",
-                          style: Constants.textStyles.title2,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    );
-                  }
-                  return Container(
-                    alignment: Alignment.center,
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child:
-                          isDashboard
-                              ? Row(
-                                children:
-                                    users
-                                        .map(
-                                          (user) => Expanded(
-                                            child: UserList(user: user),
-                                          ),
-                                        )
-                                        .toList(),
-                              )
-                              : UserList(user: authCubit.state.phUser!),
-                    ),
-                  );
-                },
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            elevation: 5,
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            title: Text(
+              "Today",
+              style: Constants.textStyles.title2.copyWith(color: Colors.white),
+            ),
+            actions: [
+              GestureDetector(
+                onTap: () => Nav.pop(context),
+                child: Text(
+                  "User: ${authCubit.state.phUser?.name}    ",
+                  style: Constants.textStyles.data.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
               ),
+            ],
+            automaticallyImplyLeading: false,
+          ),
+          body:
+              isLoading
+                  ? Center(child: MainLoader())
+                  : Builder(
+                    builder: (context) {
+                      bool isOnlyDashboard = users.isEmpty && isDashboard;
+
+                      if (isPortrait(context) && isDashboard) {
+                        Future.delayed(Duration(seconds: 1), () {
+                          snack(
+                            context,
+                            "This user is a Dashboard user, which is best viewed in landscape mode, on larger displays.",
+                            isError: false,
+                          );
+                        });
+                      }
+
+                      if (isOnlyDashboard) {
+                        return Container(
+                          alignment: Alignment.center,
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Text(
+                              "No users found, create some to get started.",
+                              style: Constants.textStyles.title2,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                      return Container(
+                        alignment: Alignment.center,
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child:
+                              isDashboard
+                                  ? Row(
+                                    children:
+                                        users
+                                            .map(
+                                              (user) => Expanded(
+                                                child: UserList(user: user),
+                                              ),
+                                            )
+                                            .toList(),
+                                  )
+                                  : UserList(user: authCubit.state.phUser!),
+                        ),
+                      );
+                    },
+                  ),
+        ),
+      ],
     );
   }
 }

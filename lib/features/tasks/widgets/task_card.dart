@@ -30,7 +30,7 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
-    List<Color> colors = getRandomColors();
+    List<Color> colors = [const Color.fromARGB(255, 25, 25, 25), Colors.black];
     Color borderColor = colors.first;
     final Color bgColor = colors.first;
     // Calculate luminance to decide text color

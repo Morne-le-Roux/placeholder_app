@@ -14,9 +14,5 @@ Future<void> initRC(String email) async {
   configuration = PurchasesConfiguration(dotenv.env['RC_GOOGLE_API_KEY'] ?? "")
     ..appUserID = "$email-${packageInfo.packageName}";
 
-  log(
-    "Logging into RevenueCat with $email-${packageInfo.packageName.split("co.za.disnetdev.")[1]}",
-  );
-
   await Purchases.configure(configuration);
 }

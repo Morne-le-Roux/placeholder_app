@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/contact_support.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
@@ -65,6 +66,10 @@ class _ChooseUserState extends State<ChooseUser> {
     }
   }
 
+  List<PHUser> get dashboards =>
+      phUsers.where((phu) => phu.isDashboard).toList();
+  List<PHUser> get users => phUsers.where((phu) => !phu.isDashboard).toList();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,36 +108,64 @@ class _ChooseUserState extends State<ChooseUser> {
         child:
             loadingUsers
                 ? MainLoader()
-                : Stack(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Center(
-                        child: SingleChildScrollView(
-                          child: Wrap(
+                : Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Text("Dashboards", style: Constants.textStyles.title),
+                          Gap(20),
+                          Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             spacing: 40,
                             alignment: WrapAlignment.center,
                             children: [
-                              ...phUsers.map(
+                              ...dashboards.map(
                                 (phu) => UserSelector(
                                   key: Key(phu.id),
                                   user: phu,
                                   showEdit: showEdit,
-                                  onTap: () async {
-                                    if (showEdit) {
-                                      await createNewUser(context, user: phu);
-                                      init();
-                                      return;
-                                    } else {
-                                      authCubit.setPHUser(phu);
-                                      if (authCubit.state.phUser != null) {
-                                        Nav.push(context, Dashboard());
-                                      }
-                                    }
-                                  },
-                                  onDelete:
-                                      () => setState(() => phUsers.remove(phu)),
+                                  onTap: () => _handleTap(phu),
+                                  onLongPress: () => _handleLongPress(),
+                                  onDelete: () => _handleDelete(phu),
+                                ),
+                              ),
+                              UserSelector(
+                                isDashboard: true,
+                                onDelete: () {},
+                                onTap: () async {
+                                  bool canCreateNewUser = canCreateUser(
+                                    context,
+                                    currentUserCount: phUsers.length,
+                                  );
+                                  if (canCreateNewUser) {
+                                    await createNewUser(
+                                      context,
+                                      isDashboard: true,
+                                    );
+                                  }
+                                  init();
+                                },
+                                onLongPress: () => _handleLongPress(),
+                              ),
+                            ],
+                          ),
+                          Text("Users", style: Constants.textStyles.title),
+                          Gap(20),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 40,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              ...users.map(
+                                (phu) => UserSelector(
+                                  key: Key(phu.id),
+                                  user: phu,
+                                  showEdit: showEdit,
+                                  onTap: () => _handleTap(phu),
+                                  onDelete: () => _handleDelete(phu),
+                                  onLongPress: () => _handleLongPress(),
                                 ),
                               ),
                               UserSelector(
@@ -143,27 +176,48 @@ class _ChooseUserState extends State<ChooseUser> {
                                     currentUserCount: phUsers.length,
                                   );
                                   if (canCreateNewUser) {
-                                    await createNewUser(context);
+                                    await createNewUser(
+                                      context,
+                                      isDashboard: false,
+                                    );
                                   }
                                   init();
                                 },
+                                onLongPress: () => _handleLongPress(),
                               ),
                             ],
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      right: 20,
-                      top: 20,
-                      child: IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => setState(() => showEdit = !showEdit),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
       ),
     );
+  }
+
+  void _handleLongPress() {
+    setState(() => showEdit = !showEdit);
+  }
+
+  void _handleTap(PHUser phu) async {
+    if (showEdit) {
+      await createNewUser(context, user: phu);
+      init();
+      setState(() => showEdit = false);
+      return;
+    } else {
+      authCubit.setPHUser(phu);
+      if (authCubit.state.phUser != null) {
+        Nav.push(context, Dashboard());
+      }
+    }
+  }
+
+  void _handleDelete(PHUser phu) {
+    setState(() {
+      phUsers.remove(phu);
+      showEdit = false;
+    });
   }
 }
