@@ -58,13 +58,19 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.black,
-            gradient: RadialGradient(
-              center: Alignment.topCenter,
-              radius: 1.5,
-              colors: [Colors.deepOrange, Colors.deepOrange.withAlpha(0)],
+        Hero(
+          tag: "shadow",
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              gradient: RadialGradient(
+                center: Alignment.topCenter,
+                radius: 1.5,
+                colors: [
+                  Colors.deepOrange.withAlpha(150),
+                  Colors.deepOrange.withAlpha(0),
+                ],
+              ),
             ),
           ),
         ),

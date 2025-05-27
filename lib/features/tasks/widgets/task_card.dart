@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
-import 'package:placeholder/core/usecases/get_random_colors.dart';
 import 'package:placeholder/features/tasks/models/task.dart';
 import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
 import 'package:placeholder/features/tasks/usecases/was_task_done_yesterday.dart';

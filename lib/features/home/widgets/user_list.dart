@@ -119,29 +119,18 @@ class _UserListState extends State<UserList> {
                       child: Container(
                         margin: EdgeInsets.all(4),
                         padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color.fromARGB(255, 36, 36, 36),
-                            width: 3,
-                          ),
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color.fromARGB(255, 41, 41, 41),
-                              const Color.fromARGB(255, 0, 0, 0),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          color: const Color.fromARGB(255, 39, 39, 39),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
+
                         child: Row(
                           children: [
-                            Avatar(url: user.avatarURL),
-                            Gap(10),
+                            SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Avatar(url: user.avatarURL),
+                            ),
+                            Gap(20),
                             Text(
                               user.name,
-                              style: Constants.textStyles.title3.copyWith(
+                              style: Constants.textStyles.title2.copyWith(
                                 color: const Color.fromARGB(255, 207, 207, 207),
                               ),
                             ),
@@ -151,7 +140,7 @@ class _UserListState extends State<UserList> {
 
                             if (!isDashboard)
                               Text(
-                                "Next User >>",
+                                ">>",
                                 style: Constants.textStyles.description
                                     .copyWith(fontStyle: FontStyle.italic),
                               ),
@@ -225,10 +214,11 @@ class _UserListState extends State<UserList> {
           ),
           if (isLoading) Center(child: MainLoader()),
 
+          //Shadow below appbar
           AnimatedContainer(
-            duration: Duration(milliseconds: 200),
+            duration: Duration(milliseconds: 300),
             curve: Curves.ease,
-            height: 50,
+            height: 30,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               gradient:

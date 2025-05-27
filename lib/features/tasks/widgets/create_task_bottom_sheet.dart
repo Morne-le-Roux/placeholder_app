@@ -59,11 +59,23 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Text(
-                "Create Task for ${widget.phUser.name}",
-                style: Constants.textStyles.title3.copyWith(
-                  color: const Color.fromARGB(255, 207, 207, 207),
-                ),
+              Builder(
+                builder: (context) {
+                  String title =
+                      "Create Task for ${widget.phUser.name} as ${context.read<AuthCubit>().state.phUser?.name}";
+
+                  if (widget.phUser.id ==
+                      context.read<AuthCubit>().state.phUser?.id) {
+                    title = "Create Task for Yourself";
+                  }
+
+                  return Text(
+                    title,
+                    style: Constants.textStyles.title3.copyWith(
+                      color: const Color.fromARGB(255, 207, 207, 207),
+                    ),
+                  );
+                },
               ),
               Gap(20),
               TextFormField(

@@ -1,10 +1,10 @@
-import 'dart:developer';
+import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:placeholder/main.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:uuid/uuid.dart';
 
 import '../models/p_h_user.dart';
 
@@ -16,6 +16,42 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login(String email, String password) async {
     try {
       await pb.collection("users").authWithPassword(email, password);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> createLoginEvent() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    try {
+      await pb
+          .collection("login_events")
+          .create(
+            body: {
+              "user": pb.authStore.record!.id,
+              "app_version": packageInfo.version,
+              "string_array_test": [
+                "login",
+                "logout",
+                "create_task",
+                "create_dashboard",
+                "create_user",
+              ],
+            },
+          );
+
+      final response = await pb
+          .collection("login_events")
+          .getList(filter: "user = '${pb.authStore.record!.id}'");
+      List<String> stringArrayTest = [];
+      for (var item in response.items) {
+        if (item.data["string_array_test"] != null) {
+          final dynamicList = item.data["string_array_test"] as List<dynamic>;
+          stringArrayTest.addAll(
+            dynamicList.map((item) => item.toString()).toList(),
+          );
+        }
+      }
     } catch (e) {
       rethrow;
     }
@@ -79,22 +115,42 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> checkSub() async {
-    log(pb.authStore.record?.data["email"] ?? "");
-    await Purchases.logIn(pb.authStore.record?.data["email"] ?? "");
+    // if manual pro untill date override is set, check if it's before now, if it is, set pro to true
+    // if it's not set, check if the user has an active subscription
+    String? manualProUntillDateOverride =
+        pb.authStore.record?.data["manual_pro_untill_date_override"];
+
+    if (manualProUntillDateOverride != null) {
+      DateTime? manualProUntillDateOverrideDate = DateTime.tryParse(
+        manualProUntillDateOverride,
+      );
+      if (manualProUntillDateOverrideDate != null &&
+          manualProUntillDateOverrideDate.isBefore(DateTime.now())) {
+        setPro(true);
+        return;
+      } else {
+        // if the manual pro untill date override is not before now, set it to null
+        pb
+            .collection("users")
+            .update(
+              pb.authStore.record!.id,
+              body: {"manual_pro_untill_date_override": null},
+            );
+      }
+    }
 
     final CustomerInfo customerInfo = await Purchases.getCustomerInfo();
 
     final bool isPro = customerInfo.activeSubscriptions.isNotEmpty;
 
-    if (isPro) {
-      emit(state.copyWith(isPro: isPro));
-    } else {
-      emit(state.copyWith(isPro: false));
-    }
+    setPro(isPro);
   }
 
-  void setPro() {
-    emit(state.copyWith(isPro: true));
+  void setPro(bool isPro) {
+    pb
+        .collection("users")
+        .update(pb.authStore.record!.id, body: {"is_pro": isPro});
+    emit(state.copyWith(isPro: isPro));
   }
 
   Future<void> getSubscriptions() async {
