@@ -73,6 +73,7 @@ class MainApp extends StatelessWidget {
         builder: (context) {
           if (pb.authStore.isValid) {
             pb.collection("users").authRefresh();
+            context.read<AuthCubit>().createLoginEvent();
             return ChooseUser();
           } else {
             return Login();
