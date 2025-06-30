@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -25,6 +27,8 @@ class _LoginState extends State<Login> {
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   final FocusNode _passwordFocusNode2 = FocusNode();
+
+  Timer? _emailCheckDebounce;
 
   String _email = "";
   String _password = "";
@@ -60,78 +64,110 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: SizedBox(
-                    width: isPortrait(context)
-                        ? MediaQuery.of(context).size.width
-                        : MediaQuery.of(context).size.height,
+                    width:
+                        isPortrait(context)
+                            ? MediaQuery.of(context).size.width
+                            : MediaQuery.of(context).size.height,
 
                     child: FittedBox(
-                      child: Text("PLACEHOLDER",
-                          style: Constants.textStyles.title
-                              .copyWith(color: Colors.white, fontWeight: FontWeight.w900)),
+                      child: Text(
+                        "PLACEHOLDER",
+                        style: Constants.textStyles.title.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 Gap(20),
-                Text(_register ? "Register" : "Login",
-                    style: Constants.textStyles.title
-                        .copyWith(color: Colors.white, fontSize: 28)),
+                Text(
+                  _register ? "Register" : "Login",
+                  style: Constants.textStyles.title.copyWith(
+                    color: Colors.white,
+                    fontSize: 28,
+                  ),
+                ),
                 TextFormField(
-                    autovalidateMode: AutovalidateMode.onUnfocus,
-                    initialValue: _email,
-                    style: TextStyle(color: Colors.white),
-                    validator: (value) {
-                      String? error = validateEmail(value);
-                      setState(() => _isValid = false);
-                      if (error == null) setState(() => _isValid = true);
-                      return error;
-                    },
-                    onChanged: (value) => setState(() => _email = value),
-                    onEditingComplete: () => _passwordFocusNode.requestFocus(),
-                    decoration: InputDecoration(label: Text("Email")),
-                    focusNode: _emailFocusNode),
+                  autovalidateMode: AutovalidateMode.onUnfocus,
+                  initialValue: _email,
+                  style: TextStyle(color: Colors.white),
+                  validator: (value) {
+                    String? error = validateEmail(value);
+                    setState(() => _isValid = false);
+                    if (error == null) setState(() => _isValid = true);
+                    return error;
+                  },
+                  onChanged: (value) {
+                    setState(() => _email = value);
+                    if (_emailCheckDebounce?.isActive ?? false) {
+                      _emailCheckDebounce?.cancel();
+                    }
+                    _emailCheckDebounce = Timer(
+                      const Duration(milliseconds: 1000),
+                      () async {
+                        bool emailExists = await authCubit.isEmailAvailable(
+                          _email,
+                        );
+                        setState(() => _register = !emailExists);
+                      },
+                    );
+                  },
+                  onEditingComplete: () => _passwordFocusNode.requestFocus(),
+                  decoration: InputDecoration(label: Text("Email")),
+                  focusNode: _emailFocusNode,
+                ),
                 TextFormField(
-                    autovalidateMode: AutovalidateMode.onUnfocus,
-                    style: TextStyle(color: Colors.white),
-                    initialValue: _password,
-                    obscureText: true,
-                    validator: (value) {
-                      String? error = validatePassword(value);
-                      setState(() => _isValid = false);
-                      if (error == null) setState(() => _isValid = true);
-                      return error;
-                    },
-                    onChanged: (value) => setState(() => _password = value),
-                    onEditingComplete: () => _register
-                        ? _passwordFocusNode2.requestFocus()
-                        : _passwordFocusNode.unfocus(),
-                    decoration: InputDecoration(label: Text("Password")),
-                    focusNode: _passwordFocusNode),
+                  autovalidateMode: AutovalidateMode.onUnfocus,
+                  style: TextStyle(color: Colors.white),
+                  initialValue: _password,
+                  obscureText: true,
+                  validator: (value) {
+                    String? error = validatePassword(value);
+                    setState(() => _isValid = false);
+                    if (error == null) setState(() => _isValid = true);
+                    return error;
+                  },
+                  onChanged: (value) => setState(() => _password = value),
+                  onEditingComplete:
+                      () =>
+                          _register
+                              ? _passwordFocusNode2.requestFocus()
+                              : _passwordFocusNode.unfocus(),
+                  decoration: InputDecoration(label: Text("Password")),
+                  focusNode: _passwordFocusNode,
+                ),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
-                  child: _register
-                      ? TextFormField(
-                          style: TextStyle(color: Colors.white),
-                          autovalidateMode: AutovalidateMode.onUnfocus,
-                          initialValue: _password2,
-                          obscureText: true,
-                          validator: (value) {
-                            String? error = value!.isEmpty
-                                ? "Password is required"
-                                : _password != _password2
-                                    ? "Passwords do not match"
-                                    : null;
-                            setState(() => _isValid = false);
-                            if (error == null) setState(() => _isValid = true);
-                            return error;
-                          },
-                          onChanged: (value) =>
-                              setState(() => _password2 = value),
-                          onEditingComplete: () =>
-                              _passwordFocusNode2.unfocus(),
-                          decoration:
-                              InputDecoration(label: Text("Confirm Password")),
-                          focusNode: _passwordFocusNode2)
-                      : const SizedBox.shrink(),
+                  child:
+                      _register
+                          ? TextFormField(
+                            style: TextStyle(color: Colors.white),
+                            autovalidateMode: AutovalidateMode.onUnfocus,
+                            initialValue: _password2,
+                            obscureText: true,
+                            validator: (value) {
+                              String? error =
+                                  value!.isEmpty
+                                      ? "Password is required"
+                                      : _password != _password2
+                                      ? "Passwords do not match"
+                                      : null;
+                              setState(() => _isValid = false);
+                              if (error == null)
+                                setState(() => _isValid = true);
+                              return error;
+                            },
+                            onChanged:
+                                (value) => setState(() => _password2 = value),
+                            onEditingComplete:
+                                () => _passwordFocusNode2.unfocus(),
+                            decoration: InputDecoration(
+                              label: Text("Confirm Password"),
+                            ),
+                            focusNode: _passwordFocusNode2,
+                          )
+                          : const SizedBox.shrink(),
                 ),
                 Gap(5),
                 LargeRoundedButton(
@@ -155,11 +191,13 @@ class _LoginState extends State<Login> {
                     }
                   },
                 ),
+                Gap(20),
                 GestureDetector(
                   onTap: () => setState(() => _register = !_register),
                   child: Text(
-                      "${_register ? "Already a member?" : "Not a member?"} ${_register ? "Login instead." : "Register instead."}",
-                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                    "${_register ? "Already a member?" : "Not a member?"} ${_register ? "Login instead." : "Register instead."}",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
               ],
             ),

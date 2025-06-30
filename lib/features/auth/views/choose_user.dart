@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/contact_support.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
@@ -15,7 +14,6 @@ import 'package:placeholder/features/auth/widgets/user_selector.dart';
 import 'package:placeholder/features/home/views/dashboard.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
-import 'package:placeholder/features/payment/usecases/init_rc.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
 import 'package:placeholder/main.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -55,8 +53,7 @@ class _ChooseUserState extends State<ChooseUser> {
     try {
       setState(() => loadingUsers = true);
       phUsers = await authCubit.fetchUsers();
-      await initRC(pb.authStore.record!.data['email'] ?? "");
-      await authCubit.checkSub();
+      // await authCubit.checkSub();
       phUsers = await authCubit.fetchUsers();
     } catch (e) {
       snack(context, e.toString());
@@ -78,7 +75,7 @@ class _ChooseUserState extends State<ChooseUser> {
               if (value == "contact") {
                 contactSupport("", isError: false);
               } else if (value == "logOut") {
-                pb.authStore.clear();
+                sb.auth.signOut();
                 Purchases.logOut();
                 Nav.pushAndPop(context, Login());
               }

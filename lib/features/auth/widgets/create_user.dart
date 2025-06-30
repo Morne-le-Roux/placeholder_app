@@ -41,7 +41,7 @@ class _CreateUserState extends State<CreateUser> {
           name: "",
           avatarURL: null,
           isDashboard: false,
-          accountHolderID: pb.authStore.record?.id ?? "",
+          accountHolderID: sb.auth.currentUser?.id ?? "",
         );
     super.initState();
   }
@@ -101,7 +101,7 @@ class _CreateUserState extends State<CreateUser> {
                   if (file != null) {
                     setState(() => loadingAvatar = true);
                     phUser = phUser.copyWith(
-                      avatarURL: await uploadImage(file, userId: phUser.id),
+                      avatarURL: await uploadImage(file),
                     );
                     setState(() => loadingAvatar = false);
                   }
@@ -142,7 +142,7 @@ class _CreateUserState extends State<CreateUser> {
                                   Icons.person,
                                   color: const Color.fromARGB(255, 45, 45, 45),
                                 )
-                                : Image.network(phUser.avatarURL!),
+                                : Image.network(getImageUrl(phUser.avatarURL!)),
                       ),
                     ),
                   ),

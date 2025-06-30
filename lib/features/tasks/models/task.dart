@@ -25,14 +25,14 @@ class Task {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'user_id': userId,
-      'account_holder_id': accountHolderId,
+      'user': userId,
+      'account_holder': accountHolderId,
       'title': title,
       'content': content,
       'recurring': recurring,
       'created_at': createdAt,
       'last_done': lastDone,
-      'author_id': authorId,
+      'author': authorId,
       'deleted': deleted,
     };
   }
@@ -40,14 +40,14 @@ class Task {
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
       id: map['id'] as String,
-      userId: map['user_id'] as String,
-      accountHolderId: map['account_holder_id'] as String,
+      userId: map['user'] as String,
+      accountHolderId: map['account_holder'] as String,
       title: map['title'] as String,
       content: map['content'] as String,
       recurring: map['recurring'] == null ? false : map['recurring'] as bool,
-      createdAt: map['created'] as String,
+      createdAt: map['created_at'] as String,
       lastDone: map['last_done'] as String?,
-      authorId: map["author_id"] as String?,
+      authorId: map["author"] as String?,
       deleted: map["deleted"] == null ? false : map["deleted"] as bool?,
     );
   }

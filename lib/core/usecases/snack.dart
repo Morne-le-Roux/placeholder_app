@@ -1,83 +1,81 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
 import 'package:placeholder/core/constants/constants.dart';
-import 'package:placeholder/core/usecases/contact_support.dart';
-import 'package:placeholder/core/usecases/nav.dart';
+import 'package:placeholder/main.dart';
+import 'package:simple_shadow/simple_shadow.dart';
+import 'package:toastification/toastification.dart';
 
-void snack(context, String message, {bool isError = true}) {
-  showDialog(
-      barrierColor: Colors.black.withOpacity(0.5),
-      barrierDismissible: true,
-      context: context,
-      builder: (context) => Material(
-            color: Colors.transparent,
-            child: Center(
-              child: Container(
-                margin: EdgeInsets.all(20),
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 30, 30, 30),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (isError)
-                    Text(
-                      "Something went wrong",
-                      style: Constants.textStyles.title2,
-                    ),
-                    if (isError)
-                    Gap(10),
-                    if (isError)
-                    Text(
-                        """We've logged this error and the let the developers know.
-                        
-If this is not the first time you are getting this error, please contact support.""",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                        )),
-                    Gap(10),
-                    Text(
-                      message,
-                      textAlign: TextAlign.center,
-                      style: isError ? TextStyle(
-                          color: Colors.white, fontStyle: FontStyle.italic) : TextStyle(
-                          color: Colors.white, fontStyle: FontStyle.italic, fontSize: 18),
-                      maxLines: 4,
-                    ),
+void snack(BuildContext context, String message) {
+  log(message);
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (isError)
-                        TextButton(
-                            style: ButtonStyle(
-                                padding:
-                                    WidgetStateProperty.all(EdgeInsets.zero)),
-                            onPressed: () {
-                              Nav.pop(context);
-                              // ignore: deprecated_member_use
-                              contactSupport(message);
-                            },
-                            child: Text("Contact Support")),
-                        TextButton(
-                            onPressed: () {
-                              Nav.pop(context);
-                            },
-                            child: Text("Close")),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ));
+  String messageToShow = message;
+
+  if (message.contains("message:")) {
+    messageToShow = toBeginningOfSentenceCase(
+      message.split("message: ")[1].split(", ")[0],
+    );
+  }
+
+  if (messageToShow == "{}") {
+    messageToShow = "An error occurred:";
+  }
+
+  if (message.contains("error:")) {
+    messageToShow = toBeginningOfSentenceCase(
+      message.split("error: ")[1].split(", ")[0],
+    );
+  }
+
+  if (message.contains("details:")) {
+    messageToShow =
+        "$messageToShow ${toBeginningOfSentenceCase(message.split("details: ")[1].split(", ")[0])}";
+  }
+
+  //Log snacks
+  sb.from("snacks").insert({"snack": messageToShow});
+
+  toastification.showCustom(
+    alignment: Alignment.bottomCenter,
+    autoCloseDuration: const Duration(seconds: 7),
+    builder:
+        (BuildContext context, ToastificationItem holder) =>
+            _ToastWidget(message: messageToShow),
+  );
 }
 
+class _ToastWidget extends StatelessWidget {
+  const _ToastWidget({required this.message});
 
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleShadow(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Constants.colors.error, width: 2),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              spacing: 10,
+              children: [
+                Icon(Icons.error, color: Constants.colors.error),
+                Text("An Error Occured", style: Constants.textStyles.title3),
+              ],
+            ),
+            Divider(color: Colors.white.withAlpha(100)),
+            Text(message, style: Constants.textStyles.description),
+          ],
+        ),
+      ),
+    );
+  }
+}

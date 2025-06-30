@@ -35,7 +35,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
       id: Uuid().v4().replaceAll("-", ""),
       userId: widget.phUser.id,
       authorId: authCubit.state.phUser?.id ?? "",
-      accountHolderId: pb.authStore.record?.id ?? "",
+      accountHolderId: sb.auth.currentUser?.id ?? "",
       title: "",
       content: "",
       recurring: false,

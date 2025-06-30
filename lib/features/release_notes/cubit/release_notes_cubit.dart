@@ -34,13 +34,11 @@ class ReleaseNotesCubit extends HydratedCubit<ReleaseNotesState> {
   Future<String?> getReleaseNotes() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-    final response = await pb.collection("release_notes").getFullList();
+    final response = await sb.from("release_notes").select();
     String? notes =
-        response
-            .firstWhereOrNull(
-              (element) => element.data["version"] == packageInfo.version,
-            )
-            ?.data["notes"];
+        response.firstWhereOrNull(
+          (element) => element["version"] == packageInfo.version,
+        )?["notes"];
     return notes;
   }
 }

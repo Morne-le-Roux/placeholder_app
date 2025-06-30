@@ -22,7 +22,7 @@ class PHUser {
       'name': name,
       'avatar_url': avatarURL,
       'is_dashboard': isDashboard,
-      'account_holder_id': accountHolderID,
+      'account_holder': accountHolderID,
     };
   }
 
@@ -32,7 +32,7 @@ class PHUser {
       name: map['name'] as String,
       avatarURL: map['avatar_url'] != null ? map['avatar_url'] as String : null,
       isDashboard: map['is_dashboard'] as bool,
-      accountHolderID: map['account_holder_id'] as String,
+      accountHolderID: map['account_holder'] as String,
     );
   }
 

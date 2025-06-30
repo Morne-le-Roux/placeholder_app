@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:placeholder/core/usecases/is_portrait.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
-import 'package:placeholder/features/auth/usecases/refresh_auth.dart';
+import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/home/widgets/user_list.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/main.dart';
@@ -44,7 +44,12 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     init();
     _authRefreshTimer = Timer.periodic(const Duration(days: 1), (timer) {
-      refreshAuth();
+      try {
+        sb.auth.refreshSession();
+      } catch (e) {
+        snack(context, e.toString());
+        Nav.pushAndPop(context, Login());
+      }
     });
     super.initState();
   }
@@ -87,7 +92,6 @@ class _DashboardState extends State<Dashboard> {
                       snack(
                         context,
                         "This user is a Dashboard user, which is best viewed in landscape mode, on larger displays.",
-                        isError: false,
                       );
                     });
                   }

@@ -5,18 +5,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:placeholder/core/themes/text_form_field_theme.dart';
 import 'package:placeholder/core/usecases/init_hydrated_bloc.dart';
-import 'package:placeholder/core/usecases/init_pb.dart';
 import 'package:placeholder/core/usecases/init_sentry.dart';
+import 'package:placeholder/core/usecases/supabase_client.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
-import 'package:pocketbase/pocketbase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:toastification/toastification.dart';
 
 import 'features/tasks/cubit/task_cubit.dart';
 
-late PocketBase pb;
-late AuthStore authStore;
+SupabaseClient sb = Supabase.instance.client;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +32,7 @@ void main() async {
 
   if (kDebugMode) await dotenv.load(fileName: "staging.env");
   if (!kDebugMode) await dotenv.load(fileName: "prod.env");
-  await initPB();
+  await initSupabase();
 
   await initSentry(
     mainApp: MultiBlocProvider(
@@ -41,7 +41,7 @@ void main() async {
         BlocProvider(create: (context) => TaskCubit()),
         BlocProvider(create: (context) => ReleaseNotesCubit()),
       ],
-      child: const MainApp(),
+      child: ToastificationWrapper(child: const MainApp()),
     ),
   );
 }
@@ -71,8 +71,7 @@ class MainApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       home: Builder(
         builder: (context) {
-          if (pb.authStore.isValid) {
-            pb.collection("users").authRefresh();
+          if (sb.auth.currentSession != null) {
             return ChooseUser();
           } else {
             return Login();
