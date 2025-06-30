@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:placeholder/core/usecases/pick_image.dart';
 import 'package:placeholder/core/usecases/upload_image.dart';
 import 'package:placeholder/core/widgets/buttons/large_rounded_button.dart';
@@ -17,9 +18,10 @@ import '../../../core/constants/constants.dart';
 import '../cubit/auth_cubit.dart';
 
 class CreateUser extends StatefulWidget {
-  const CreateUser({super.key, this.user});
+  const CreateUser({super.key, this.user, this.isDashboard = false});
 
   final PHUser? user;
+  final bool isDashboard;
 
   @override
   State<CreateUser> createState() => _CreateUserState();
@@ -40,7 +42,7 @@ class _CreateUserState extends State<CreateUser> {
           id: Uuid().v4().replaceAll("-", ""),
           name: "",
           avatarURL: null,
-          isDashboard: false,
+          isDashboard: widget.isDashboard,
           accountHolderID: sb.auth.currentUser?.id ?? "",
         );
     super.initState();
@@ -67,33 +69,62 @@ class _CreateUserState extends State<CreateUser> {
                   (value) =>
                       setState(() => phUser = phUser.copyWith(name: value)),
               decoration: InputDecoration(
-                labelText: "User Name",
+                labelText: phUser.isDashboard ? "Dashboard Name" : "User Name",
                 labelStyle: Constants.textStyles.data.copyWith(
                   color: const Color.fromARGB(255, 207, 207, 207),
                 ),
               ),
             ),
             Gap(20),
-            Row(
-              children: [
-                Text(
-                  "Dashboard",
-                  style: Constants.textStyles.description.copyWith(
-                    color: const Color.fromARGB(255, 207, 207, 207),
-                  ),
-                ),
-                Expanded(child: SizedBox()),
-                Switch(
-                  inactiveTrackColor: Colors.black38,
+            Divider(thickness: 0.5),
 
-                  value: phUser.isDashboard,
-                  onChanged:
-                      (value) => setState(
-                        () => phUser = phUser.copyWith(isDashboard: value),
-                      ),
-                ),
-              ],
+            InkWell(
+              onTap:
+                  () => setState(
+                    () =>
+                        phUser = phUser.copyWith(
+                          isDashboard: !phUser.isDashboard,
+                        ),
+                  ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Is this a Dashboard?",
+                          style: Constants.textStyles.title3.copyWith(
+                            color: const Color.fromARGB(255, 207, 207, 207),
+                          ),
+                        ),
+                        Gap(5),
+                        Text(
+                          "Dashboards will be able to see all of the tasks and projects of all users. Best viewed on tablets.",
+                          style: Constants.textStyles.data.copyWith(
+                            color: const Color.fromARGB(255, 207, 207, 207),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    inactiveTrackColor: Colors.black38,
+
+                    value: phUser.isDashboard,
+                    onChanged:
+                        (value) => setState(
+                          () => phUser = phUser.copyWith(isDashboard: value),
+                        ),
+                  ),
+                ],
+              ),
             ),
+
+            Gap(10),
+            Divider(thickness: 0.5),
+            Gap(20),
+
             InkWell(
               onTap: () async {
                 try {
@@ -123,8 +154,7 @@ class _CreateUserState extends State<CreateUser> {
                     color: const Color.fromARGB(255, 0, 0, 0),
                   ),
                   child: Container(
-                    width: 150,
-                    height: 150,
+                    constraints: BoxConstraints(maxWidth: 150, maxHeight: 150),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: const Color.fromARGB(255, 25, 25, 25),
@@ -138,9 +168,20 @@ class _CreateUserState extends State<CreateUser> {
                                 ? MainLoader()
                                 : phUser.avatarURL == null ||
                                     phUser.avatarURL == ""
-                                ? Icon(
-                                  Icons.person,
-                                  color: const Color.fromARGB(255, 45, 45, 45),
+                                ? Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Icon(
+                                    phUser.isDashboard
+                                        ? Symbols.dashboard_2
+                                        : Icons.person,
+                                    color: const Color.fromARGB(
+                                      255,
+                                      45,
+                                      45,
+                                      45,
+                                    ),
+                                    size: 100,
+                                  ),
                                 )
                                 : Image.network(getImageUrl(phUser.avatarURL!)),
                       ),
@@ -152,7 +193,10 @@ class _CreateUserState extends State<CreateUser> {
             Gap(40),
 
             LargeRoundedButton(
-              text: widget.user == null ? "Create User" : "Update User",
+              text:
+                  widget.user == null
+                      ? "Create ${phUser.isDashboard ? "Dashboard" : "User"}"
+                      : "Update ${phUser.isDashboard ? "Dashboard" : "User"}",
               onPressed: () async {
                 try {
                   FocusScope.of(context).unfocus();

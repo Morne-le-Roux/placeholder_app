@@ -154,8 +154,9 @@ class _LoginState extends State<Login> {
                                       ? "Passwords do not match"
                                       : null;
                               setState(() => _isValid = false);
-                              if (error == null)
+                              if (error == null) {
                                 setState(() => _isValid = true);
+                              }
                               return error;
                             },
                             onChanged:

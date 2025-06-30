@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:placeholder/core/constants/constants.dart';
+import 'package:placeholder/core/usecases/upload_image.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
@@ -130,7 +131,7 @@ class UserSelector extends StatelessWidget {
                                     return ClipRRect(
                                       borderRadius: BorderRadius.circular(1000),
                                       child: Image.network(
-                                        user!.avatarURL!,
+                                        getImageUrl(user!.avatarURL!),
                                         width: 100,
                                         height: 100,
                                         fit: BoxFit.cover,

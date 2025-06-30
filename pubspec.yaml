@@ -17,7 +17,6 @@ dependencies:
   pocketbase: ^0.22.0
   uuid: ^4.5.1
   flutter_secure_storage: ^9.2.4
-  purchases_flutter: ^8.7.3
   intl: ^0.20.2
   sentry_flutter: ^8.14.2
   flutter_slidable: ^4.0.0
@@ -33,6 +32,7 @@ dependencies:
   simple_shadow: ^0.3.1
   toastification: ^3.0.3
   path: ^1.9.1
+  foundation: ^0.0.5
 
 dev_dependencies:
   flutter_lints: ^5.0.0
