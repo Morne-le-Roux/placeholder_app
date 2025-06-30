@@ -33,6 +33,7 @@ dependencies:
   toastification: ^3.0.3
   path: ^1.9.1
   foundation: ^0.0.5
+  flutter_animate: ^4.5.2
 
 dev_dependencies:
   flutter_lints: ^5.0.0
