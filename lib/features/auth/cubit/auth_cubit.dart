@@ -59,7 +59,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> createUser(PHUser phUser) async {
     try {
       final response = await sb.from("ph_users").insert(phUser.toMap());
-      emit(state.copyWith(phUser: PHUser.fromMap(response.toJson())));
+      emit(state.copyWith(phUser: phUser));
     } catch (e) {
       rethrow;
     }

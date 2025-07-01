@@ -82,6 +82,22 @@ class _UserListState extends State<UserList> {
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
+          Hero(
+            tag: "shadow",
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                gradient: RadialGradient(
+                  center: Alignment.topCenter,
+                  radius: 1.5,
+                  colors: [
+                    Colors.deepOrange.withAlpha(50),
+                    Colors.deepOrange.withAlpha(0),
+                  ],
+                ),
+              ),
+            ),
+          ),
           RefreshIndicator(
             onRefresh: () async {
               await init(showLoader: false);
