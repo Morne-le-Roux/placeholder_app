@@ -178,6 +178,11 @@ class _LoginState extends State<Login> {
                   onPressed: () async {
                     try {
                       setState(() => _isLoading = true);
+                      bool isEmailActive = await authCubit.isEmailAvailable(
+                        _email,
+                      );
+                      setState(() => _register = !isEmailActive);
+
                       if (_register) {
                         await authCubit.register(_email, _password);
                         await authCubit.login(_email, _password);
@@ -193,13 +198,6 @@ class _LoginState extends State<Login> {
                   },
                 ),
                 Gap(20),
-                GestureDetector(
-                  onTap: () => setState(() => _register = !_register),
-                  child: Text(
-                    "${_register ? "Already a member?" : "Not a member?"} ${_register ? "Login instead." : "Register instead."}",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
               ],
             ),
           ),

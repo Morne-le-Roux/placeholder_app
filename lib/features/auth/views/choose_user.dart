@@ -131,7 +131,7 @@ class _ChooseUserState extends State<ChooseUser> {
           body: SafeArea(
             child:
                 loadingUsers
-                    ? MainLoader()
+                    ? MainLoader(height: 100)
                     : Padding(
                       padding: EdgeInsets.all(20),
                       child: Center(
