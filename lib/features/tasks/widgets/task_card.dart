@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/features/tasks/models/task.dart';
 import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
+import 'package:placeholder/features/tasks/usecases/was_task_done_yesterday.dart';
 
 class TaskCard extends StatefulWidget {
   const TaskCard({
@@ -28,24 +29,79 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
+    List<Color> colors = [const Color.fromARGB(255, 25, 25, 25), Colors.black];
+    Color borderColor = colors.first;
+    final Color bgColor = colors.first;
+    // Calculate luminance to decide text color
+    final bool useWhiteText = bgColor.computeLuminance() < 0.5;
+    final Color textColor = useWhiteText ? Colors.white : Colors.black;
+    if (!wasTaskDoneYesterday(widget.task)) {
+      borderColor = Colors.deepOrange.withAlpha(100);
+      colors = [
+        Colors.deepOrange.withAlpha(100),
+        Colors.deepOrange.withAlpha(0),
+      ];
+    }
+
     final List<Widget> actions = [
-      SlidableAction(
+      CustomSlidableAction(
         onPressed: (context) => _handleComplete(delete: true),
         borderRadius: BorderRadius.circular(16),
         padding: EdgeInsets.zero,
-        icon: Icons.delete,
-        label: "Delete",
         foregroundColor: Colors.white,
-        backgroundColor: const Color.fromARGB(100, 255, 86, 34),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 5),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.deepOrange, width: 2),
+            color: Colors.deepOrange.withAlpha(100),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.delete, color: Colors.white),
+              Gap(5),
+              Text(
+                "Delete",
+                style: Constants.textStyles.description.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      SlidableAction(
+      CustomSlidableAction(
         padding: EdgeInsets.zero,
-        borderRadius: BorderRadius.circular(16),
         onPressed: (context) => _handleComplete(delete: false),
-        icon: Icons.check,
-        label: "Done",
         foregroundColor: Colors.white,
-        backgroundColor: const Color.fromARGB(100, 64, 195, 255),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue, width: 2),
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.blue.withAlpha(100),
+          ),
+
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check, color: Colors.white),
+              Gap(5),
+              Text(
+                "Done",
+                style: Constants.textStyles.description.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     ];
     return Padding(
@@ -91,14 +147,16 @@ class _TaskCardState extends State<TaskCard> {
                     widget.onDone();
                   }
                 },
+
         child: Slidable(
           key: Key(widget.task.id),
           endActionPane: ActionPane(
             extentRatio: 0.4,
 
             motion: DrawerMotion(),
-            children: actions,
+            children: actions.reversed.toList(),
           ),
+
           startActionPane: ActionPane(
             extentRatio: 0.4,
             motion: DrawerMotion(),
@@ -126,18 +184,12 @@ class _TaskCardState extends State<TaskCard> {
                     ),
                     child: Text("Undo?", style: Constants.textStyles.title3),
                   )
-                  : Container(
+                  : AnimatedContainer(
+                    duration: Duration(milliseconds: 1000),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 39, 39, 39),
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color.fromARGB(255, 41, 41, 41),
-                          const Color.fromARGB(255, 0, 0, 0),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      border: Border.all(color: borderColor, width: 3),
+                      gradient: LinearGradient(colors: colors),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
@@ -146,14 +198,16 @@ class _TaskCardState extends State<TaskCard> {
                         Text(
                           widget.task.title,
                           style: Constants.textStyles.title3.copyWith(
-                            color: const Color.fromARGB(255, 238, 238, 238),
+                            color: textColor,
                           ),
                         ),
                         if (widget.task.content != null &&
                             widget.task.content!.isNotEmpty)
                           Text(
                             widget.task.content!,
-                            style: Constants.textStyles.description,
+                            style: Constants.textStyles.description.copyWith(
+                              color: textColor,
+                            ),
                           ),
                         Gap(10),
                         Row(
@@ -162,14 +216,16 @@ class _TaskCardState extends State<TaskCard> {
                             Text(
                               "By: ${userNameFromID(context, userId: widget.task.authorId)}",
                               style: Constants.textStyles.data.copyWith(
-                                color: const Color.fromARGB(255, 153, 153, 153),
+                                color: textColor.withOpacity(0.7),
                               ),
                             ),
                             if (widget.task.recurring)
                               Text(
-                                "Daily",
+                                wasTaskDoneYesterday(widget.task)
+                                    ? "Daily"
+                                    : "Task not done yesterday",
                                 style: Constants.textStyles.data.copyWith(
-                                  color: Colors.grey,
+                                  color: textColor.withOpacity(0.7),
                                 ),
                               ),
                           ],
