@@ -77,21 +77,17 @@ class _DashboardState extends State<Dashboard> {
             elevation: 5,
             backgroundColor: Colors.transparent,
             centerTitle: true,
-            title: Text(
-              "Today",
-              style: Constants.textStyles.title2.copyWith(color: Colors.white),
-            ),
-            actions: [
-              GestureDetector(
-                onTap: () => Nav.pop(context),
-                child: Text(
-                  "User: ${authCubit.state.phUser?.name}    ",
-                  style: Constants.textStyles.data.copyWith(
-                    color: Colors.white,
-                  ),
+            title: GestureDetector(
+              onTap: () => Nav.pop(context),
+              child: Text(
+                !isDashboard
+                    ? "Welcome back, ${authCubit.state.phUser?.name}"
+                    : authCubit.state.phUser?.name ?? "Dashboard",
+                style: Constants.textStyles.title2.copyWith(
+                  color: Colors.white,
                 ),
               ),
-            ],
+            ),
             automaticallyImplyLeading: false,
           ),
           body:

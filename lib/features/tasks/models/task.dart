@@ -7,6 +7,7 @@ class Task {
     required this.content,
     required this.recurring,
     required this.createdAt,
+    this.dueDate,
     required this.authorId,
     this.lastDone,
     this.deleted,
@@ -18,6 +19,7 @@ class Task {
   final String? content;
   final bool recurring;
   final String createdAt;
+  final String? dueDate;
   final String? lastDone;
   final String? authorId;
   final bool? deleted;
@@ -31,6 +33,7 @@ class Task {
       'content': content,
       'recurring': recurring,
       'created_at': createdAt,
+      'due_date': dueDate,
       'last_done': lastDone,
       'author': authorId,
       'deleted': deleted,
@@ -46,6 +49,7 @@ class Task {
       content: map['content'] as String,
       recurring: map['recurring'] == null ? false : map['recurring'] as bool,
       createdAt: map['created_at'] as String,
+      dueDate: map['due_date'] as String?,
       lastDone: map['last_done'] as String?,
       authorId: map["author"] as String?,
       deleted: map["deleted"] == null ? false : map["deleted"] as bool?,
@@ -60,6 +64,7 @@ class Task {
     String? content,
     bool? recurring,
     String? createdAt,
+    String? dueDate,
     String? lastDone,
     String? authorId,
     bool? deleted,
@@ -72,6 +77,7 @@ class Task {
       content: content ?? this.content,
       recurring: recurring ?? this.recurring,
       createdAt: createdAt ?? this.createdAt,
+      dueDate: dueDate ?? this.dueDate,
       lastDone: lastDone ?? this.lastDone,
       authorId: authorId ?? this.authorId,
       deleted: deleted ?? this.deleted,
