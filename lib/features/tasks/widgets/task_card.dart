@@ -35,6 +35,14 @@ class _TaskCardState extends State<TaskCard> {
 
   AuthCubit get authCubit => context.read<AuthCubit>();
 
+  late Task task;
+
+  @override
+  void initState() {
+    task = widget.task;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Color> colors = [const Color.fromARGB(255, 25, 25, 25), Colors.black];
@@ -43,7 +51,7 @@ class _TaskCardState extends State<TaskCard> {
     // Calculate luminance to decide text color
     final bool useWhiteText = bgColor.computeLuminance() < 0.5;
     final Color textColor = useWhiteText ? Colors.white : Colors.black;
-    if (!wasTaskDoneYesterday(widget.task)) {
+    if (!wasTaskDoneYesterday(task)) {
       borderColor = Colors.deepOrange.withAlpha(100);
       colors = [
         Colors.deepOrange.withAlpha(100),
@@ -118,19 +126,28 @@ class _TaskCardState extends State<TaskCard> {
         onTap:
             done
                 ? () => setState(() => done = false)
-                : () {
+                : () async {
                   PHUser? user = authCubit.state.phUsers.firstWhereOrNull(
-                    (u) => u.id == widget.task.userId,
+                    (u) => u.id == task.userId,
                   );
                   if (user == null) {
                     snack(context, "The owner of this task is not available.");
                     return;
                   }
-                  createTask(context, task: widget.task, phUser: user);
+                  Task? returnedTask = await createTask(
+                    context,
+                    task: task,
+                    phUser: user,
+                  );
+                  if (returnedTask != null) {
+                    setState(() {
+                      task = returnedTask;
+                    });
+                  }
                 },
 
         child: Slidable(
-          key: Key(widget.task.id),
+          key: Key(task.id),
           endActionPane: ActionPane(
             extentRatio: 0.4,
 
@@ -177,15 +194,14 @@ class _TaskCardState extends State<TaskCard> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          widget.task.title,
+                          task.title,
                           style: Constants.textStyles.title3.copyWith(
                             color: textColor,
                           ),
                         ),
-                        if (widget.task.content != null &&
-                            widget.task.content!.isNotEmpty)
+                        if (task.content != null && task.content!.isNotEmpty)
                           Text(
-                            widget.task.content!,
+                            task.content!,
                             style: Constants.textStyles.description.copyWith(
                               color: textColor,
                             ),
@@ -195,14 +211,14 @@ class _TaskCardState extends State<TaskCard> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "By: ${userNameFromID(context, userId: widget.task.authorId)}",
+                              "By: ${userNameFromID(context, userId: task.authorId)}",
                               style: Constants.textStyles.data.copyWith(
                                 color: textColor.withOpacity(0.7),
                               ),
                             ),
-                            if (widget.task.recurring)
+                            if (task.recurring)
                               Text(
-                                wasTaskDoneYesterday(widget.task)
+                                wasTaskDoneYesterday(task)
                                     ? "Daily"
                                     : "Task not done yesterday",
                                 style: Constants.textStyles.data.copyWith(

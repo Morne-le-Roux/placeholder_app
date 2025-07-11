@@ -14,10 +14,16 @@ import '../cubit/task_cubit.dart';
 import '../models/task.dart';
 
 class CreateTaskBottomSheet extends StatefulWidget {
-  const CreateTaskBottomSheet({super.key, required this.phUser, this.task});
+  const CreateTaskBottomSheet({
+    super.key,
+    required this.phUser,
+    this.task,
+    this.onTaskCreated,
+  });
 
   final PHUser phUser;
   final Task? task;
+  final Function(Task)? onTaskCreated;
 
   @override
   State<CreateTaskBottomSheet> createState() => _CreateTaskBottomSheetState();
@@ -30,18 +36,22 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
 
   bool isLoading = false;
 
+  bool get isEditing => widget.task != null;
+
   @override
   void initState() {
-    task = Task(
-      id: Uuid().v4().replaceAll("-", ""),
-      userId: widget.phUser.id,
-      authorId: authCubit.state.phUser?.id ?? "",
-      accountHolderId: sb.auth.currentUser?.id ?? "",
-      title: "",
-      content: "",
-      recurring: false,
-      createdAt: DateTime.now().toString(),
-    );
+    task =
+        widget.task ??
+        Task(
+          id: Uuid().v4(),
+          userId: widget.phUser.id,
+          authorId: authCubit.state.phUser?.id ?? "",
+          accountHolderId: sb.auth.currentUser?.id ?? "",
+          title: "",
+          content: "",
+          recurring: false,
+          createdAt: DateTime.now().toString(),
+        );
     super.initState();
   }
 
@@ -126,13 +136,20 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
               ),
               Gap(20),
               LargeRoundedButton(
-                text: "Create Task",
+                text: isEditing ? "Update Task" : "Create Task",
                 isLoading: isLoading,
                 isValid: task.title.isNotEmpty,
                 onPressed: () async {
                   try {
                     setState(() => isLoading = true);
-                    await taskCubit.createTask(task);
+                    if (isEditing) {
+                      await taskCubit.updateTask(task);
+                    } else {
+                      await taskCubit.createTask(task);
+                    }
+
+                    widget.onTaskCreated?.call(task);
+
                     setState(() => isLoading = false);
                     Nav.pop(context);
                   } catch (e) {
