@@ -97,56 +97,66 @@ class _UserListState extends State<UserList> {
                 child: Column(
                   children: [
                     Gap(10),
-                    InkWell(
-                      splashColor: Colors.deepOrange.withAlpha(100),
-                      borderRadius: BorderRadius.circular(20),
-                      onTap:
-                          !isDashboard
-                              ? () {
-                                int currentIndex = phUsers.indexWhere(
-                                  (u) => u.id == user.id,
-                                );
-                                int nextIndex =
-                                    (currentIndex + 1) >= phUsers.length
-                                        ? 0
-                                        : currentIndex + 1;
-                                user = phUsers[nextIndex];
-                                setState(() {
-                                  init(showLoader: true);
-                                });
-                              }
-                              : null,
-                      child: Container(
-                        margin: EdgeInsets.all(4),
-                        padding: EdgeInsets.all(10),
+                    Builder(
+                      builder: (context) {
+                        bool canTap = !isDashboard && phUsers.length > 1;
+                        return InkWell(
+                          splashColor: Colors.deepOrange.withAlpha(100),
+                          borderRadius: BorderRadius.circular(20),
+                          onTap:
+                              canTap
+                                  ? () {
+                                    int currentIndex = phUsers.indexWhere(
+                                      (u) => u.id == user.id,
+                                    );
+                                    int nextIndex =
+                                        (currentIndex + 1) >= phUsers.length
+                                            ? 0
+                                            : currentIndex + 1;
+                                    user = phUsers[nextIndex];
+                                    setState(() {
+                                      init(showLoader: true);
+                                    });
+                                  }
+                                  : null,
+                          child: Container(
+                            margin: EdgeInsets.all(4),
+                            padding: EdgeInsets.all(10),
 
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: Avatar(url: user.avatarURL),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: Avatar(url: user.avatarURL),
+                                ),
+                                Gap(20),
+                                Text(
+                                  user.name,
+                                  style: Constants.textStyles.title2.copyWith(
+                                    color: const Color.fromARGB(
+                                      255,
+                                      207,
+                                      207,
+                                      207,
+                                    ),
+                                  ),
+                                ),
+                                Gap(10),
+
+                                Expanded(child: SizedBox()),
+
+                                if (canTap)
+                                  Text(
+                                    ">>",
+                                    style: Constants.textStyles.description
+                                        .copyWith(fontStyle: FontStyle.italic),
+                                  ),
+                              ],
                             ),
-                            Gap(20),
-                            Text(
-                              user.name,
-                              style: Constants.textStyles.title2.copyWith(
-                                color: const Color.fromARGB(255, 207, 207, 207),
-                              ),
-                            ),
-                            Gap(10),
-
-                            Expanded(child: SizedBox()),
-
-                            if (!isDashboard)
-                              Text(
-                                ">>",
-                                style: Constants.textStyles.description
-                                    .copyWith(fontStyle: FontStyle.italic),
-                              ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      },
                     ),
                     Gap(10),
                     ...tasks.map(

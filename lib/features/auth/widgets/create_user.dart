@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -159,10 +160,10 @@ class _CreateUserState extends State<CreateUser> {
                       shape: BoxShape.circle,
                       color: const Color.fromARGB(255, 25, 25, 25),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(1000),
-                      child: FittedBox(
-                        fit: BoxFit.cover,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(1000),
                         child:
                             loadingAvatar
                                 ? MainLoader()
@@ -183,7 +184,24 @@ class _CreateUserState extends State<CreateUser> {
                                     size: 100,
                                   ),
                                 )
-                                : Image.network(getImageUrl(phUser.avatarURL!)),
+                                : CachedNetworkImage(
+                                  imageUrl: getImageUrl(phUser.avatarURL!),
+                                  placeholder: (context, url) => MainLoader(),
+                                  errorWidget:
+                                      (context, url, error) => Icon(
+                                        phUser.isDashboard
+                                            ? Symbols.dashboard_2
+                                            : Icons.person,
+                                        color: const Color.fromARGB(
+                                          255,
+                                          45,
+                                          45,
+                                          45,
+                                        ),
+                                        size: 100,
+                                      ),
+                                  fit: BoxFit.cover,
+                                ),
                       ),
                     ),
                   ),

@@ -6,18 +6,19 @@ import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/payment/views/paywall.dart';
 
 bool canAddTask(BuildContext context, {required int currentTaskCount}) {
-  bool canAddTask = context.read<AuthCubit>().state.isPro;
+  return true; // Temporarily returning true for development purposes
+  // bool canAddTask = context.read<AuthCubit>().state.isPro;
 
-  if (!canAddTask) {
-    bool aboveLimit =
-        currentTaskCount >= Constants.limits.taskCountLimitPerUser;
-    if (aboveLimit) {
-      Nav.push(context, Paywall());
-      return false;
-    } else {
-      return true;
-    }
-  } else {
-    return true;
-  }
+  // if (!canAddTask) {
+  //   bool aboveLimit =
+  //       currentTaskCount >= Constants.limits.taskCountLimitPerUser;
+  //   if (aboveLimit) {
+  //     Nav.push(context, Paywall());
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // } else {
+  //   return true;
+  // }
 }
