@@ -1,8 +1,14 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:gap/gap.dart';
 import 'package:placeholder/core/constants/constants.dart';
+import 'package:placeholder/core/usecases/snack.dart';
+import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
+import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:placeholder/features/tasks/models/task.dart';
+import 'package:placeholder/features/tasks/usecases/create_task.dart';
 import 'package:placeholder/features/tasks/usecases/get_user_name_from_id.dart';
 import 'package:placeholder/features/tasks/usecases/was_done_yesterday.dart';
 
@@ -26,6 +32,8 @@ class _TaskCardState extends State<TaskCard> {
   bool done = false;
 
   double height = 80;
+
+  AuthCubit get authCubit => context.read<AuthCubit>();
 
   @override
   Widget build(BuildContext context) {
@@ -110,42 +118,15 @@ class _TaskCardState extends State<TaskCard> {
         onTap:
             done
                 ? () => setState(() => done = false)
-                : () async {
-                  bool? markAsDone = await showAdaptiveDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          backgroundColor: const Color.fromARGB(
-                            255,
-                            24,
-                            24,
-                            24,
-                          ),
-                          title: Text(
-                            "Mark as done?",
-                            style: Constants.textStyles.title3.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
-                              child: Text("Yes"),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context, false);
-                              },
-                              child: Text("No"),
-                            ),
-                          ],
-                        ),
+                : () {
+                  PHUser? user = authCubit.state.phUsers.firstWhereOrNull(
+                    (u) => u.id == widget.task.userId,
                   );
-                  if (markAsDone == true) {
-                    widget.onDone();
+                  if (user == null) {
+                    snack(context, "The owner of this task is not available.");
+                    return;
                   }
+                  createTask(context, task: widget.task, phUser: user);
                 },
 
         child: Slidable(

@@ -14,9 +14,10 @@ import '../cubit/task_cubit.dart';
 import '../models/task.dart';
 
 class CreateTaskBottomSheet extends StatefulWidget {
-  const CreateTaskBottomSheet({super.key, required this.phUser});
+  const CreateTaskBottomSheet({super.key, required this.phUser, this.task});
 
   final PHUser phUser;
+  final Task? task;
 
   @override
   State<CreateTaskBottomSheet> createState() => _CreateTaskBottomSheetState();

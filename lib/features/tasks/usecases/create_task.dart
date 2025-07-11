@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:placeholder/features/tasks/models/task.dart';
 
 import '../../auth/models/p_h_user.dart';
 import '../widgets/create_task_bottom_sheet.dart';
 
-Future<void> createTask(BuildContext context, PHUser phUser) async {
+Future<void> createTask(
+  BuildContext context, {
+  required PHUser phUser,
+  Task? task,
+}) async {
   await showModalBottomSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     context: context,
-    builder: (context) => Padding(
-        padding: MediaQuery.of(context).viewInsets,
-        child: CreateTaskBottomSheet(phUser: phUser)),
+    builder:
+        (context) => Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: CreateTaskBottomSheet(phUser: phUser, task: task),
+        ),
   );
 }

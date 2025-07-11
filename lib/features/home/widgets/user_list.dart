@@ -216,7 +216,7 @@ class _UserListState extends State<UserList> {
                   currentTaskCount: tasks.length,
                 );
                 if (canTask) {
-                  await createTask(context, user);
+                  await createTask(context, phUser: user);
                 }
                 await init(showLoader: tasks.isEmpty);
               },
