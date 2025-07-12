@@ -1,10 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
 import 'package:placeholder/core/constants/constants.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
+import 'package:placeholder/features/payment/widgets/pricing_option_card.dart';
+import 'package:placeholder/services/purchase_service.dart';
 
 class Paywall extends StatefulWidget {
   const Paywall({super.key});
@@ -15,24 +20,18 @@ class Paywall extends StatefulWidget {
 
 class _PaywallState extends State<Paywall> {
   AuthCubit get appCubit => context.read<AuthCubit>();
-  bool canMakePayments = false;
+  PurchaseService purchaseService = PurchaseService();
 
   @override
   void initState() {
-    init();
+    PurchaseService().onPurchasingChanged = (isPurchasing) {
+      if (isPurchasing) {
+        setState(() => loading = true);
+      } else {
+        setState(() => loading = false);
+      }
+    };
     super.initState();
-  }
-
-  Future<void> init() async {
-    try {
-      // canMakePayments = await Purchases.canMakePayments();
-      setState(() => loading = true);
-      await appCubit.getSubscriptions();
-      setState(() => loading = false);
-    } catch (e) {
-      setState(() => loading = false);
-      snack(context, e.toString());
-    }
   }
 
   bool loading = false;
@@ -68,48 +67,48 @@ class _PaywallState extends State<Paywall> {
                         textAlign: TextAlign.center,
                       ),
                       Expanded(child: SizedBox()),
-                      if (!canMakePayments)
+                      if (!purchaseService.isAvailable)
                         Text(
                           "It seems you are not connected to a authorized store. Please contact Support.",
                           style: Constants.textStyles.title2,
                           textAlign: TextAlign.center,
                         ),
                       Gap(20),
-                      // BlocBuilder<AuthCubit, AuthState>(
-                      //   builder: (context, state) {
-                      //     return Column(
-                      //       children:
-                      //           state.availableSubscriptions
-                      //               .map(
-                      //                 (e) => PricingOptionCard(
-                      //                   title: toBeginningOfSentenceCase(
-                      //                     e.packageType.name,
-                      //                   ),
-                      //                   description:
-                      //                       e.packageType.name == "annual"
-                      //                           ? "Renewed Annually.\nGet 2 Months Free."
-                      //                           : "Renewed every month",
-                      //                   price: e.storeProduct.priceString,
-                      //                   onPressed: () async {
-                      //                     try {
-                      //                       await Purchases.purchasePackage(e);
-                      //                       appCubit.setPro();
-                      //                     } catch (e) {
-                      //                       log(
-                      //                         "Error purchasing subscription: $e",
-                      //                       );
-                      //                       snack(
-                      //                         context,
-                      //                         "Error purchasing subscription: $e",
-                      //                       );
-                      //                     }
-                      //                   },
-                      //                 ),
-                      //               )
-                      //               .toList(),
-                      //     );
-                      //   },
-                      // ),
+                      BlocBuilder<AuthCubit, AuthState>(
+                        builder: (context, state) {
+                          return Column(
+                            children:
+                                PurchaseService().products
+                                    .map(
+                                      (e) => PricingOptionCard(
+                                        title: toBeginningOfSentenceCase(
+                                          e.title ?? "",
+                                        ),
+                                        description: e.subtitle ?? "",
+                                        price: e.productDetails?.price ?? "",
+                                        onPressed: () async {
+                                          try {
+                                            if (e.productDetails != null) {
+                                              purchaseService.buy(
+                                                e.productDetails!,
+                                              );
+                                            }
+                                          } catch (e) {
+                                            log(
+                                              "Error purchasing subscription: $e",
+                                            );
+                                            snack(
+                                              context,
+                                              "Error purchasing subscription: $e",
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    )
+                                    .toList(),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),

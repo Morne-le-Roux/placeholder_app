@@ -78,13 +78,6 @@ class AuthCubit extends Cubit<AuthState> {
     emit(state.copyWith(isPro: true));
   }
 
-  Future<void> getSubscriptions() async {
-    // final Offerings offerings = await Purchases.getOfferings();
-    // final List<Package> subscriptions =
-    //     offerings.current?.availablePackages ?? [];
-    // emit(state.copyWith(availableSubscriptions: subscriptions));
-  }
-
   Future<void> deleteUser(String userId) async {
     await sb.from("ph_users").delete().eq("id", userId);
   }

@@ -54,7 +54,7 @@ class _TextStyles {
 class _Limits {
   const _Limits();
 
-  final int taskCountLimitPerUser = kDebugMode ? 99 : 3;
-  final int userCountLimit = kDebugMode ? 99 : 2;
+  final int taskCountLimitPerUser = kDebugMode ? 3 : 3;
+  final int userCountLimit = kDebugMode ? 2 : 2;
   // final bool canViewDashboardOnFree = false;
 }
