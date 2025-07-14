@@ -107,26 +107,28 @@ class PurchaseService {
   Future<void> _processPurchase(PurchaseDetails purchase) async {
     final String productId = purchase.productID;
 
-    final DateTime now = DateTime.now();
-    late DateTime expiry;
+    bool isPro = await isUserPro();
 
-    switch (productId) {
-      case monthlySubId:
-        expiry = now.add(Duration(days: 30));
-        break;
-      case annualSubId:
-        expiry = now.add(Duration(days: 365));
-        break;
-      default:
-        return;
-    }
+    // final DateTime now = DateTime.now();
+    // late DateTime expiry;
 
-    final userId = sb.auth.currentUser!.id;
+    // switch (productId) {
+    //   case monthlySubId:
+    //     expiry = now.add(Duration(days: 30));
+    //     break;
+    //   case annualSubId:
+    //     expiry = now.add(Duration(days: 365));
+    //     break;
+    //   default:
+    //     return;
+    // }
 
-    await sb
-        .from('profiles')
-        .update({'is_pro': true, 'pro_expiry_date': expiry.toIso8601String()})
-        .eq('id', userId);
+    // final userId = sb.auth.currentUser!.id;
+
+    // await sb
+    //     .from('profiles')
+    //     .update({'is_pro': true, 'pro_expiry_date': expiry.toIso8601String()})
+    //     .eq('id', userId);
   }
 
   Future<bool> isUserPro() async {

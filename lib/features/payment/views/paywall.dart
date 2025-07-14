@@ -78,7 +78,7 @@ class _PaywallState extends State<Paywall> {
                         builder: (context, state) {
                           return Column(
                             children:
-                                PurchaseService().products
+                                purchaseService.products
                                     .map(
                                       (e) => PricingOptionCard(
                                         title: toBeginningOfSentenceCase(
