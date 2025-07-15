@@ -9,6 +9,7 @@ import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
 import 'package:placeholder/features/auth/usecases/can_create_user.dart';
+import 'package:placeholder/features/auth/usecases/check_and_set_pro.dart';
 import 'package:placeholder/features/auth/usecases/show_release_notes.dart';
 import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/auth/widgets/user_selector.dart';
@@ -52,8 +53,7 @@ class _ChooseUserState extends State<ChooseUser> {
   init() async {
     try {
       setState(() => loadingUsers = true);
-      phUsers = await authCubit.fetchUsers();
-      // await authCubit.checkSub();
+      await checkAndSetPro(context);
       phUsers = await authCubit.fetchUsers();
     } catch (e) {
       snack(context, e.toString());

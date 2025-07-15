@@ -5,9 +5,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:placeholder/core/constants/constants.dart';
+import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/core/widgets/loaders/main_loader.dart';
 import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
+import 'package:placeholder/features/auth/usecases/check_and_set_pro.dart';
 import 'package:placeholder/features/payment/widgets/pricing_option_card.dart';
 import 'package:placeholder/services/purchase_service.dart';
 
@@ -91,6 +93,10 @@ class _PaywallState extends State<Paywall> {
                                             if (e.productDetails != null) {
                                               purchaseService.buy(
                                                 e.productDetails!,
+                                                onSuccess: () async {
+                                                  await checkAndSetPro(context);
+                                                  Nav.pop(context);
+                                                },
                                               );
                                             }
                                           } catch (e) {

@@ -15,8 +15,6 @@ class PurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
 
-  static const String monthlySubId = "monthly";
-  static const String annualSubId = "annual";
   String subId = "co.za.disnetdev.placeholder.pro";
 
   List<PurchasableProduct> products = [];
@@ -24,6 +22,9 @@ class PurchaseService {
 
   /// Callback to notify UI of loading state
   void Function(bool)? onPurchasingChanged;
+
+  /// Callback to run on a purchase success
+  Future<void> Function()? _onPurchaseSuccess;
 
   // Initialize on app startup
   Future<void> init() async {
@@ -83,7 +84,8 @@ class PurchaseService {
     }
   }
 
-  void buy(ProductDetails product) {
+  void buy(ProductDetails product, {Future<void> Function()? onSuccess}) {
+    _onPurchaseSuccess = onSuccess;
     onPurchasingChanged?.call(true);
     final purchaseParam = PurchaseParam(productDetails: product);
     _iap.buyNonConsumable(purchaseParam: purchaseParam);
@@ -92,10 +94,21 @@ class PurchaseService {
   Future<void> _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
     for (final purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased) {
-        await _processPurchase(purchase);
-        if (purchase.pendingCompletePurchase) {
-          await _iap.completePurchase(purchase);
+        final isValid = await _verifyPurchase(purchase);
+
+        if (isValid) {
+          if (_onPurchaseSuccess != null) {
+            await _onPurchaseSuccess!();
+            _onPurchaseSuccess = null;
+          }
+
+          if (purchase.pendingCompletePurchase) {
+            await _iap.completePurchase(purchase);
+          }
+        } else {
+          debugPrint("❌ Invalid purchase detected! Not granting access.");
         }
+
         onPurchasingChanged?.call(false);
       } else if (purchase.status == PurchaseStatus.error) {
         debugPrint('Purchase failed: ${purchase.error}');
@@ -104,35 +117,7 @@ class PurchaseService {
     }
   }
 
-  Future<void> _processPurchase(PurchaseDetails purchase) async {
-    final String productId = purchase.productID;
-
-    bool isPro = await isUserPro();
-
-    // final DateTime now = DateTime.now();
-    // late DateTime expiry;
-
-    // switch (productId) {
-    //   case monthlySubId:
-    //     expiry = now.add(Duration(days: 30));
-    //     break;
-    //   case annualSubId:
-    //     expiry = now.add(Duration(days: 365));
-    //     break;
-    //   default:
-    //     return;
-    // }
-
-    // final userId = sb.auth.currentUser!.id;
-
-    // await sb
-    //     .from('profiles')
-    //     .update({'is_pro': true, 'pro_expiry_date': expiry.toIso8601String()})
-    //     .eq('id', userId);
-  }
-
   Future<bool> isUserPro() async {
-    final Completer<bool> completer = Completer<bool>();
     final List<PurchaseDetails> allPurchases = [];
 
     final sub = InAppPurchase.instance.purchaseStream.listen((purchases) {
@@ -143,33 +128,18 @@ class PurchaseService {
     await Future.delayed(Duration(seconds: 1));
     await sub.cancel();
 
-    final now = DateTime.now();
-
     for (final purchase in allPurchases) {
-      if (purchase.status == PurchaseStatus.purchased) {
-        final transactionDate = DateTime.fromMillisecondsSinceEpoch(
-          int.tryParse(purchase.transactionDate ?? '') ?? 0,
-        );
-
-        final isMonthly = purchase.productID == monthlySubId;
-        final isAnnual = purchase.productID == annualSubId;
-
-        final expiry =
-            isMonthly
-                ? transactionDate.add(Duration(days: 30))
-                : isAnnual
-                ? transactionDate.add(Duration(days: 365))
-                : transactionDate;
-
-        if (now.isBefore(expiry)) {
-          completer.complete(true);
-          break;
+      if (purchase.status == PurchaseStatus.purchased ||
+          purchase.status == PurchaseStatus.restored) {
+        if (purchase.productID == subId) {
+          return true;
         }
       }
+      if (purchase.status == PurchaseStatus.pending) {
+        await _iap.completePurchase(purchase);
+      }
     }
-
-    if (!completer.isCompleted) completer.complete(false);
-    return completer.future;
+    return false;
   }
 
   void dispose() {
@@ -210,5 +180,29 @@ class PurchasableProduct {
       title: map['title'] != null ? map['title'] as String : null,
       subtitle: map['subtitle'] != null ? map['subtitle'] as String : null,
     );
+  }
+}
+
+Future<bool> _verifyPurchase(PurchaseDetails purchase) async {
+  try {
+    final res = await sb.functions.invoke(
+      'verify_purchase',
+      body: {
+        'platform':
+            defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
+        'purchaseToken': purchase.verificationData.serverVerificationData,
+        'productId': purchase.productID,
+        'packageName': 'co.za.disnetdev.placeholder',
+        'receiptData':
+            purchase.verificationData.serverVerificationData, // iOS only
+      },
+    );
+
+    final valid = res.status == 200 && res.data['valid'] == true;
+    debugPrint('🔍 Purchase verification result: $valid');
+    return valid;
+  } catch (e) {
+    debugPrint('❌ Error verifying purchase: $e');
+    return false;
   }
 }

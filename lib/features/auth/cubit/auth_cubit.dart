@@ -74,8 +74,8 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void setPro() {
-    emit(state.copyWith(isPro: true));
+  void setLocalPro(bool pro) {
+    emit(state.copyWith(isPro: pro));
   }
 
   Future<void> deleteUser(String userId) async {
