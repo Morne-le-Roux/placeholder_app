@@ -18,6 +18,7 @@ import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/core/usecases/snack.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
 import 'package:placeholder/main.dart';
+import 'package:placeholder/services/purchase_service.dart';
 
 import '../usecases/create_new_user.dart';
 
@@ -51,6 +52,12 @@ class _ChooseUserState extends State<ChooseUser> {
   }
 
   init() async {
+    try {
+      await PurchaseService().init();
+    } catch (e) {
+      snack(context, "Something went wrong getting your purchases: \n$e");
+    }
+
     try {
       setState(() => loadingUsers = true);
       await checkAndSetPro(context);

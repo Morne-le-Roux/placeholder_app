@@ -34,7 +34,6 @@ void main() async {
   if (kDebugMode) await dotenv.load(fileName: "staging.env");
   if (!kDebugMode) await dotenv.load(fileName: "prod.env");
   await initSupabase();
-  await PurchaseService().init();
 
   await initSentry(
     mainApp: MultiBlocProvider(

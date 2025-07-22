@@ -81,6 +81,9 @@ class _PaywallState extends State<Paywall> {
                           return Column(
                             children:
                                 purchaseService.products
+                                    .where(
+                                      (test) => test.type == ProductType.sub,
+                                    )
                                     .map(
                                       (e) => PricingOptionCard(
                                         title: toBeginningOfSentenceCase(
@@ -91,7 +94,7 @@ class _PaywallState extends State<Paywall> {
                                         onPressed: () async {
                                           try {
                                             if (e.productDetails != null) {
-                                              purchaseService.buy(
+                                              purchaseService.buySubscription(
                                                 e.productDetails!,
                                                 onSuccess: () async {
                                                   await checkAndSetPro(context);
