@@ -171,11 +171,9 @@ class _UserListState extends State<UserList> {
                         child: TaskCard(
                           key: Key(task.id),
                           task: task,
-                          onDone: () {
+                          onDone: () async {
                             log("onDone ${task.id}");
-                            setState(
-                              () => tasks.removeWhere((t) => t.id == task.id),
-                            );
+
                             if (task.recurring) {
                               taskCubit.updateTask(
                                 task.copyWith(
@@ -183,15 +181,24 @@ class _UserListState extends State<UserList> {
                                 ),
                               );
                             } else {
-                              taskCubit.deleteTask(task);
+                              try {
+                                await taskCubit.deleteTask(task);
+                              } catch (e) {
+                                snack(context, e.toString());
+                              }
                             }
+
+                            tasks.removeWhere((t) => t.id == task.id);
                           },
-                          onDismissed: () {
+                          onDismissed: () async {
                             log("onDismissed ${task.id}");
-                            setState(
-                              () => tasks.removeWhere((t) => t.id == task.id),
-                            );
-                            taskCubit.deleteTask(task);
+
+                            try {
+                              await taskCubit.deleteTask(task);
+                            } catch (e) {
+                              snack(context, e.toString());
+                            }
+                            tasks.removeWhere((t) => t.id == task.id);
                           },
                         ),
                       ),
@@ -204,10 +211,13 @@ class _UserListState extends State<UserList> {
           Positioned(
             bottom: 20,
             right: 10,
-            child: FloatingActionButton.small(
-              backgroundColor: const Color.fromARGB(255, 39, 39, 39),
-              foregroundColor: const Color.fromARGB(255, 207, 207, 207),
+            child: FloatingActionButton(
+              backgroundColor: Constants.colors.primary,
+              foregroundColor: const Color.fromARGB(255, 255, 255, 255),
               heroTag: "add_user_${user.id}",
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
               elevation: 2,
               child: Icon(Icons.add_rounded),
               onPressed: () async {

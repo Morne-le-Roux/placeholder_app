@@ -77,7 +77,7 @@ class _PaywallState extends State<Paywall> {
                         ),
                       Gap(20),
                       BlocBuilder<AuthCubit, AuthState>(
-                        builder: (context, state) {
+                        builder: (blocContext, state) {
                           return Column(
                             children:
                                 purchaseService.products

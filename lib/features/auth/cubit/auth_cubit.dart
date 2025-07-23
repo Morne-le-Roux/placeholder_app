@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:placeholder/features/auth/models/user.dart';
 import 'package:placeholder/main.dart';
 
 import '../models/p_h_user.dart';
@@ -80,5 +81,28 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> deleteUser(String userId) async {
     await sb.from("ph_users").delete().eq("id", userId);
+  }
+
+  Future<User?> getAccountHolderDetails() async {
+    try {
+      if (sb.auth.currentUser?.id != null) {
+        final response = await sb
+            .from('profiles')
+            .select()
+            .eq('id', sb.auth.currentUser!.id);
+        if (response.isNotEmpty) {
+          final profile = response.first;
+          final accountHolder = User.fromMap(profile);
+
+          emit(state.copyWith(accountHolder: accountHolder));
+          return accountHolder;
+        }
+      } else {
+        throw "No user logged in";
+      }
+      return null;
+    } catch (e) {
+      rethrow;
+    }
   }
 }
