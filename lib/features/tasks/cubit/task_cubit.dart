@@ -31,6 +31,11 @@ class TaskCubit extends Cubit<TaskState> {
           .from("tasks")
           .update(task.copyWith(deleted: true).toMap())
           .eq("id", task.id);
+
+      await sb
+          .from("tasks")
+          .update({"deleted": true})
+          .eq("parent_task", task.id);
     } catch (e) {
       rethrow;
     }
@@ -43,7 +48,25 @@ class TaskCubit extends Cubit<TaskState> {
           .select("*")
           .eq("user", userId)
           .eq("deleted", false);
-      return response.map((e) => Task.fromMap(e)).toList();
+      List<Task> allTasks = response.map((e) => Task.fromMap(e)).toList();
+
+      // Build a map of id -> Task for quick lookup
+      final Map<String, Task> taskMap = {for (var t in allTasks) t.id: t};
+      // List to hold root tasks (no parent)
+      final List<Task> rootTasks = [];
+
+      for (final task in allTasks) {
+        if (task.parentTask != null) {
+          final parent = taskMap[task.parentTask];
+          if (parent != null) {
+            parent.subTasks.add(task);
+          }
+        } else {
+          rootTasks.add(task);
+        }
+      }
+
+      return rootTasks;
     } catch (e) {
       rethrow;
     }

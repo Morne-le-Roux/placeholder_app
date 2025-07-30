@@ -1,8 +1,16 @@
+import 'dart:developer';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:placeholder/core/usecases/extract_date.dart';
 import 'package:placeholder/core/usecases/nav.dart';
 import 'package:placeholder/features/auth/models/p_h_user.dart';
+import 'package:placeholder/features/tasks/usecases/can_add_tasks.dart';
+import 'package:placeholder/features/tasks/usecases/create_task.dart';
+import 'package:placeholder/features/tasks/widgets/task_card.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/constants.dart';
@@ -19,11 +27,14 @@ class CreateTaskBottomSheet extends StatefulWidget {
     required this.phUser,
     this.task,
     this.onTaskCreated,
+    this.parentTaskIdIfNew,
+    this.recurringIfChild,
   });
-
   final PHUser phUser;
   final Task? task;
   final Function(Task)? onTaskCreated;
+  final String? parentTaskIdIfNew;
+  final bool? recurringIfChild;
 
   @override
   State<CreateTaskBottomSheet> createState() => _CreateTaskBottomSheetState();
@@ -31,6 +42,7 @@ class CreateTaskBottomSheet extends StatefulWidget {
 
 class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
   late Task task;
+  bool get isSubtask => task.parentTask != null;
   AuthCubit get authCubit => context.read<AuthCubit>();
   TaskCubit get taskCubit => context.read<TaskCubit>();
 
@@ -49,9 +61,11 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
           accountHolderId: sb.auth.currentUser?.id ?? "",
           title: "",
           content: "",
-          recurring: false,
+          recurring: widget.recurringIfChild ?? false,
           createdAt: DateTime.now().toString(),
+          parentTask: widget.parentTaskIdIfNew,
         );
+
     super.initState();
   }
 
@@ -69,9 +83,11 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
         padding: EdgeInsets.all(20),
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "Create Task for ${widget.phUser.name}",
+                "${isEditing ? "Update" : "Create"} ${isSubtask ? "Subtask" : "Task"} for ${widget.phUser.name}",
+                textAlign: TextAlign.center,
                 style: Constants.textStyles.title3.copyWith(
                   color: const Color.fromARGB(255, 207, 207, 207),
                 ),
@@ -115,26 +131,127 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
                         setState(() => task = task.copyWith(content: value)),
               ),
               Gap(20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Recurring (Daily)",
-                    style: Constants.textStyles.description.copyWith(
-                      color: const Color.fromARGB(255, 207, 207, 207),
+              if (!isSubtask)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Recurring (Daily)",
+                      style: Constants.textStyles.description.copyWith(
+                        color: const Color.fromARGB(255, 207, 207, 207),
+                      ),
+                    ),
+                    Switch(
+                      value: task.recurring,
+                      inactiveTrackColor: Colors.black38,
+                      onChanged:
+                          (value) => setState(
+                            () => task = task.copyWith(recurring: value),
+                          ),
+                    ),
+                  ],
+                ),
+              Gap(10),
+              Divider(thickness: 0.3),
+              Gap(10),
+              InkWell(
+                onTap: () async {
+                  DateTime? dueDate;
+                  DateTime now = DateTime.now();
+                  dueDate = await showDatePicker(
+                    initialDate: DateTime.tryParse(task.dueDate ?? ""),
+                    context: context,
+                    firstDate: now,
+                    lastDate: now.copyWith(year: now.year + 20),
+                  );
+                  setState(() {
+                    if (dueDate != null) {
+                      task = task.copyWith(dueDate: dueDate.toIso8601String());
+                    }
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      task.dueDate == null || (task.dueDate?.isEmpty ?? false)
+                          ? "Set Due Date"
+                          : "Due by: ${formatFriendlyDate(task.dueDate ?? "")}",
+                      style: Constants.textStyles.description.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                    Icon(Symbols.date_range, color: Colors.white),
+                  ],
+                ),
+              ),
+              Gap(10),
+              Divider(thickness: 0.3),
+              Gap(20),
+
+              if (isEditing && !isSubtask)
+                for (Task subtask in task.subTasks)
+                  TaskCard(
+                    task: subtask,
+                    onDismissed: () async {
+                      try {
+                        await taskCubit.deleteTask(subtask);
+                      } catch (e) {
+                        snack(context, e.toString());
+                      }
+                      task.subTasks.removeWhere((t) => t.id == subtask.id);
+                    },
+                    onDone: () async {
+                      taskCubit.updateTask(
+                        subtask.copyWith(lastDone: DateTime.now().toString()),
+                      );
+                      setState(() {
+                        subtask = subtask.copyWith(
+                          lastDone: DateTime.now().toString(),
+                        );
+                      });
+                    },
+                  ),
+              Gap(20),
+
+              if (isEditing && !isSubtask)
+                InkWell(
+                  onTap: () async {
+                    PHUser? phUser = authCubit.state.phUsers.firstWhereOrNull(
+                      (test) => test.id == task.userId,
+                    );
+                    if (phUser != null) {
+                      Task? subtask = await createTask(
+                        context,
+                        phUser: phUser,
+                        parentIdIfNew: task.id,
+                        recurringIfChild: task.recurring,
+                      );
+                      if (subtask != null) {
+                        setState(() => task.subTasks.add(subtask));
+                      }
+                    } else {
+                      snack(context, "Something went wrong, no user found.");
+                      return;
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(color: Colors.white, width: 0.5),
+                    ),
+                    child: Text(
+                      "Add a subtask",
+                      textAlign: TextAlign.center,
+                      style: Constants.textStyles.description.copyWith(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  Switch(
-                    value: task.recurring,
-                    inactiveTrackColor: Colors.black38,
-                    onChanged:
-                        (value) => setState(
-                          () => task = task.copyWith(recurring: value),
-                        ),
-                  ),
-                ],
-              ),
+                ),
               Gap(20),
+
               LargeRoundedButton(
                 text: isEditing ? "Update Task" : "Create Task",
                 isLoading: isLoading,
@@ -147,9 +264,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
                     } else {
                       await taskCubit.createTask(task);
                     }
-
                     widget.onTaskCreated?.call(task);
-
                     setState(() => isLoading = false);
                     Nav.pop(context);
                   } catch (e) {

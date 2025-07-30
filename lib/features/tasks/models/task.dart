@@ -11,7 +11,9 @@ class Task {
     required this.authorId,
     this.lastDone,
     this.deleted,
-  });
+    this.parentTask,
+    List<Task>? subTasks,
+  }) : subTasks = subTasks ?? [];
   final String id;
   final String userId;
   final String accountHolderId;
@@ -23,6 +25,8 @@ class Task {
   final String? lastDone;
   final String? authorId;
   final bool? deleted;
+  final String? parentTask;
+  List<Task> subTasks;
 
   Map<String, dynamic> toMap() {
     return {
@@ -37,6 +41,7 @@ class Task {
       'last_done': lastDone,
       'author': authorId,
       'deleted': deleted,
+      'parent_task': parentTask,
     };
   }
 
@@ -53,6 +58,7 @@ class Task {
       lastDone: map['last_done'] as String?,
       authorId: map["author"] as String?,
       deleted: map["deleted"] == null ? false : map["deleted"] as bool?,
+      parentTask: map['parent_task'] as String?,
     );
   }
 
@@ -68,6 +74,7 @@ class Task {
     String? lastDone,
     String? authorId,
     bool? deleted,
+    String? parentTask,
   }) {
     return Task(
       id: id ?? this.id,
@@ -81,6 +88,7 @@ class Task {
       lastDone: lastDone ?? this.lastDone,
       authorId: authorId ?? this.authorId,
       deleted: deleted ?? this.deleted,
+      parentTask: parentTask ?? this.parentTask,
     );
   }
 }

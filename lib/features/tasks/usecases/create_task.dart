@@ -8,6 +8,8 @@ Future<Task?> createTask(
   BuildContext context, {
   required PHUser phUser,
   Task? task,
+  String? parentIdIfNew,
+  bool? recurringIfChild,
 }) async {
   Task? returnedTask;
 
@@ -19,8 +21,10 @@ Future<Task?> createTask(
         (context) => Padding(
           padding: MediaQuery.of(context).viewInsets,
           child: CreateTaskBottomSheet(
+            recurringIfChild: recurringIfChild,
             phUser: phUser,
             task: task,
+            parentTaskIdIfNew: parentIdIfNew,
             onTaskCreated: (newTask) {
               returnedTask = newTask;
             },
