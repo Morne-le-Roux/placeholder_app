@@ -43,8 +43,23 @@ class _UserListState extends State<UserList> {
   Future<void> init({bool showLoader = false}) async {
     try {
       setState(() => isLoading = showLoader);
-      tasks = await taskCubit.fetchTasks(user.id);
-      tasks.removeWhere((task) => isTaskDoneToday(task));
+      List<Task> fetchedTasks = await taskCubit.fetchTasks(user.id);
+      // Filter out parent tasks that are done today, and their children
+      List<Task> filteredTasks = [];
+      for (final task in fetchedTasks) {
+        if (isTaskDoneToday(task)) {
+          // Parent is done, skip parent and all its children
+          continue;
+        }
+        // If not done, keep the parent, but filter its children recursively
+        if (task.subTasks.isNotEmpty) {
+          // Only keep children if parent is not done
+          task.subTasks = task.subTasks;
+        }
+        filteredTasks.add(task);
+      }
+      tasks = filteredTasks;
+      phUsers.clear();
       phUsers.addAll(authCubit.state.phUsers);
       phUsers.removeWhere((u) => u.isDashboard);
       setState(() => isLoading = false);
@@ -190,7 +205,7 @@ class _UserListState extends State<UserList> {
 
                             tasks.removeWhere((t) => t.id == task.id);
                           },
-                          onDismissed: () async {
+                          onDelete: () async {
                             log("onDismissed ${task.id}");
 
                             try {

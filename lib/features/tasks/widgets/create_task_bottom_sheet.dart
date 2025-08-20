@@ -193,7 +193,7 @@ class _CreateTaskBottomSheetState extends State<CreateTaskBottomSheet> {
                 for (Task subtask in task.subTasks)
                   TaskCard(
                     task: subtask,
-                    onDismissed: () async {
+                    onDelete: () async {
                       try {
                         await taskCubit.deleteTask(subtask);
                       } catch (e) {

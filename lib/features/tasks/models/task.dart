@@ -10,7 +10,7 @@ class Task {
     this.dueDate,
     required this.authorId,
     this.lastDone,
-    this.deleted,
+    this.deleted = false,
     this.parentTask,
     List<Task>? subTasks,
   }) : subTasks = subTasks ?? [];
@@ -24,7 +24,7 @@ class Task {
   final String? dueDate;
   final String? lastDone;
   final String? authorId;
-  final bool? deleted;
+  final bool deleted;
   final String? parentTask;
   List<Task> subTasks;
 
@@ -57,7 +57,7 @@ class Task {
       dueDate: map['due_date'] as String?,
       lastDone: map['last_done'] as String?,
       authorId: map["author"] as String?,
-      deleted: map["deleted"] == null ? false : map["deleted"] as bool?,
+      deleted: map["deleted"] == null ? false : map["deleted"] as bool,
       parentTask: map['parent_task'] as String?,
     );
   }

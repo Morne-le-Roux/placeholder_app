@@ -19,12 +19,12 @@ class TaskCard extends StatefulWidget {
   const TaskCard({
     super.key,
     required this.task,
-    required this.onDismissed,
+    required this.onDelete,
     required this.onDone,
   });
 
   final Task task;
-  final VoidCallback onDismissed;
+  final VoidCallback onDelete;
   final VoidCallback onDone;
 
   @override
@@ -290,7 +290,7 @@ class _TaskCardState extends State<TaskCard> {
                 child: TaskCard(
                   key: Key(subTask.id),
                   task: subTask,
-                  onDismissed: () async {
+                  onDelete: () async {
                     try {
                       await taskCubit.deleteTask(subTask);
                       setState(() {
@@ -325,13 +325,13 @@ class _TaskCardState extends State<TaskCard> {
 
       if (!markedForDelete) return;
       if (delete) {
-        widget.onDismissed();
+        widget.onDelete();
       } else {
         widget.onDone();
       }
     } else {
       if (delete) {
-        widget.onDismissed();
+        widget.onDelete();
       } else {
         widget.onDone();
       }
