@@ -2,16 +2,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:placeholder/main.dart';
-
-PackageInfo? packageInfo;
 
 class PurchaseService {
   static final PurchaseService _instance = PurchaseService._internal();
@@ -21,9 +20,16 @@ class PurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
 
-  String subId = "co.za.disnetdev.placeholder.pro";
+  String subId = "professional";
+  String monthlyId = "monthly";
+  String annualId = "annual";
+  String advertOneMonthId = "advert_one_month";
+  String advertThreeMonthsId = "advert_three_months";
+  String advertSixMonthsId = "advert_six_months";
+  String advertTwelveMonthsId = "advert_twelve_months";
+  String promoteListingId = "promote_listing";
 
-  Duration verificationInterval = Duration(days: 7);
+  Duration verificationInterval = Duration(minutes: 5);
 
   List<PurchasableProduct> products = [];
   bool isAvailable = false;
@@ -37,12 +43,32 @@ class PurchaseService {
   /// Callback to run on a purchase success
   Future<void> Function()? _onPurchaseSuccess;
 
+  // Guard for stuck loading
+  Timer? _purchaseTimeout;
+  bool _purchaseInProgress = false;
+
+  void _beginPurchasing({Duration timeout = const Duration(seconds: 30)}) {
+    _purchaseInProgress = true;
+    onPurchasingChanged?.call(true);
+    _purchaseTimeout?.cancel();
+    _purchaseTimeout = Timer(timeout, () {
+      if (_purchaseInProgress) {
+        debugPrint('⏱️ Purchase timed out — resetting loading state.');
+        _endPurchasing();
+      }
+    });
+  }
+
+  void _endPurchasing() {
+    _purchaseTimeout?.cancel();
+    _purchaseInProgress = false;
+    onPurchasingChanged?.call(false);
+  }
+
   // Initialize on app startup
   Future<void> init() async {
     isAvailable = await _iap.isAvailable();
     if (!isAvailable) return;
-
-    packageInfo = await PackageInfo.fromPlatform();
 
     _subscription = _iap.purchaseStream.listen(
       _handlePurchaseUpdates,
@@ -51,7 +77,7 @@ class PurchaseService {
       },
       onError: (error) {
         debugPrint('Purchase Stream Error: $error');
-        onPurchasingChanged?.call(false);
+        _endPurchasing();
       },
     );
 
@@ -59,53 +85,125 @@ class PurchaseService {
   }
 
   Future<void> _loadProducts() async {
-    Set<String> kIds = {subId};
+    Set<String> kIds = {
+      subId,
+      advertOneMonthId,
+      advertThreeMonthsId,
+      advertSixMonthsId,
+      advertTwelveMonthsId,
+      promoteListingId,
+      monthlyId,
+      annualId,
+    };
     List<GooglePlayProductDetails> subGooglePlayProductDetails = [];
+    List<ProductDetails> subAppStoreProductDetails = [];
     List<ProductDetails> normalProducts = [];
 
     final ProductDetailsResponse response = await _iap.queryProductDetails(
       kIds,
     );
-    subGooglePlayProductDetails.addAll(
-      response.productDetails
-          .where((test) => test.id == subId)
-          .map((e) => e as GooglePlayProductDetails),
-    );
-    normalProducts.addAll(
-      response.productDetails.where((test) => test.id != subId),
-    );
 
-    if (response.error != null) {
-      debugPrint('Product query error: ${response.error}');
-      return;
-    }
-
-    final sbResponse = await sb.from("products").select();
-
-    for (var i = 0; i < sbResponse.length; i++) {
-      PurchasableProduct purchasableProduct = PurchasableProduct.fromJson(
-        sbResponse[i],
+    //ANDROID
+    if (Platform.isAndroid) {
+      subGooglePlayProductDetails.addAll(
+        response.productDetails
+            .where((test) => test.id == subId)
+            .map((e) => e as GooglePlayProductDetails),
       );
-      if (purchasableProduct.id == "monthly" ||
-          purchasableProduct.id == "annual") {
-        GooglePlayProductDetails? googlePlayProductDetail =
-            subGooglePlayProductDetails.firstWhereOrNull(
-              (product) =>
-                  product
-                      .productDetails
-                      .subscriptionOfferDetails?[product.subscriptionIndex ?? 0]
-                      .basePlanId ==
-                  purchasableProduct.id,
-            );
-        purchasableProduct.productDetails =
-            googlePlayProductDetail as ProductDetails;
-      } else {
-        purchasableProduct.productDetails = normalProducts.firstWhereOrNull(
-          (test) => test.id == purchasableProduct.id,
-        );
+      normalProducts.addAll(
+        response.productDetails.where((test) => test.id != subId),
+      );
+
+      if (response.error != null) {
+        debugPrint('Product query error: ${response.error}');
+        return;
       }
-      products.add(purchasableProduct);
+
+      final sbResponse = await sb.from("products").select();
+
+      for (var i = 0; i < sbResponse.length; i++) {
+        PurchasableProduct purchasableProduct = PurchasableProduct.fromJson(
+          sbResponse[i],
+        );
+        if (purchasableProduct.id == monthlyId ||
+            purchasableProduct.id == annualId) {
+          GooglePlayProductDetails? googlePlayProductDetail =
+              subGooglePlayProductDetails.firstWhereOrNull(
+                (product) =>
+                    product
+                        .productDetails
+                        .subscriptionOfferDetails?[product.subscriptionIndex ??
+                            0]
+                        .basePlanId ==
+                    purchasableProduct.id,
+              );
+          if (googlePlayProductDetail != null) {
+            purchasableProduct.productDetails =
+                googlePlayProductDetail as ProductDetails;
+          }
+        } else {
+          purchasableProduct.productDetails = normalProducts.firstWhereOrNull(
+            (test) => test.id == purchasableProduct.id,
+          );
+        }
+
+        products.add(purchasableProduct);
+      }
+
+      //IOS
+    } else if (Platform.isIOS) {
+      subAppStoreProductDetails.addAll(
+        response.productDetails.where(
+          (test) => test.id == monthlyId || test.id == annualId,
+        ),
+      );
+      normalProducts.addAll(
+        response.productDetails.where(
+          (test) => test.id != monthlyId && test.id != annualId,
+        ),
+      );
+
+      if (response.error != null) {
+        debugPrint('Product query error: ${response.error}');
+        return;
+      }
+
+      final sbResponse = await sb.from("products").select();
+
+      for (var i = 0; i < sbResponse.length; i++) {
+        PurchasableProduct purchasableProduct = PurchasableProduct.fromJson(
+          sbResponse[i],
+        );
+
+        if (purchasableProduct.id == monthlyId ||
+            purchasableProduct.id == annualId) {
+          ProductDetails? productDetails = subAppStoreProductDetails
+              .firstWhereOrNull(
+                (product) => product.id == purchasableProduct.id,
+              );
+          if (productDetails != null) {
+            purchasableProduct.productDetails = productDetails;
+          }
+        } else {
+          purchasableProduct.productDetails = normalProducts.firstWhereOrNull(
+            (test) => test.id == purchasableProduct.id,
+          );
+        }
+
+        products.add(purchasableProduct);
+      }
     }
+    // Remove duplicate products by id
+    final uniqueProducts = <String, PurchasableProduct>{};
+    for (final product in products) {
+      uniqueProducts[product.id] = product;
+    }
+    products = uniqueProducts.values.toList();
+    products.sort((a, b) {
+      if (a.id == annualId) return -1;
+      if (b.id == annualId) return 1;
+      return 0;
+    });
   }
 
   /// Buy a consumable product
@@ -114,57 +212,96 @@ class PurchaseService {
     Future<void> Function()? onSuccess,
   }) async {
     _onPurchaseSuccess = onSuccess;
-    onPurchasingChanged?.call(true);
+    _beginPurchasing();
     final purchaseParam = PurchaseParam(productDetails: product);
-    _iap.buyConsumable(purchaseParam: purchaseParam);
+    try {
+      final ok = await _iap.buyConsumable(purchaseParam: purchaseParam);
+      if (ok == false) {
+        // Failed to launch flow
+        _endPurchasing();
+      }
+    } on PlatformException catch (e) {
+      // User canceled or platform rejected
+      debugPrint('Consumable purchase canceled/rejected: $e');
+      _endPurchasing();
+    } catch (e) {
+      _endPurchasing();
+      rethrow;
+    }
   }
 
   void buySubscription(
     ProductDetails product, {
     Future<void> Function()? onSuccess,
   }) {
-    _onPurchaseSuccess = onSuccess;
-    onPurchasingChanged?.call(true);
-    final purchaseParam = PurchaseParam(productDetails: product);
-    _iap.buyNonConsumable(purchaseParam: purchaseParam);
+    try {
+      _onPurchaseSuccess = onSuccess;
+      _beginPurchasing();
+      final purchaseParam = PurchaseParam(productDetails: product);
+      _iap
+          .buyNonConsumable(purchaseParam: purchaseParam)
+          .then((ok) {
+            if (ok == false) {
+              // Failed to launch flow
+              _endPurchasing();
+            }
+          })
+          .catchError((e) {
+            debugPrint('Subscription purchase canceled/rejected: $e');
+            _endPurchasing();
+          });
+    } catch (e) {
+      _endPurchasing();
+      rethrow;
+    }
   }
 
   Future<void> _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
-    for (final purchase in purchases) {
-      if (purchase.status == PurchaseStatus.purchased) {
-        // Complete purchase if in pending
-        if (purchase.pendingCompletePurchase) {
-          await _iap.completePurchase(purchase);
-        }
+    try {
+      // Don't flip loading back on here; it's controlled by _beginPurchasing/_endPurchasing
+      for (final purchase in purchases) {
+        if (purchase.status == PurchaseStatus.purchased) {
+          // Complete purchase if in pending
+          if (purchase.pendingCompletePurchase) {
+            await _iap.completePurchase(purchase);
+          }
 
-        // Check if this is a subscription or consumable
-        if (purchase.productID == subId) {
-          // Subscription: verify purchase and get basePlanId from backend
-          final String? basePlanId = await _getBasePlanIfValid(purchase);
-          if (basePlanId != null) {
-            currentBasePlan = basePlanId;
+          // Check if this is a subscription or consumable
+          if (purchase.productID == subId) {
+            // Subscription: verify purchase and get basePlanId from backend
+            final String? basePlanId = await _getBasePlanIfValid(purchase);
+            if (basePlanId != null) {
+              currentBasePlan = basePlanId;
+              if (_onPurchaseSuccess != null) {
+                await _onPurchaseSuccess!();
+                _onPurchaseSuccess = null;
+              }
+            } else {
+              debugPrint("❌ Invalid purchase detected! Not granting access.");
+              throw "Error with purchase verification. Please contact support.";
+            }
+          } else {
+            // Consumable: grant item, no backend verification
+            debugPrint('✅ Consumable purchased: ${purchase.productID}');
             if (_onPurchaseSuccess != null) {
               await _onPurchaseSuccess!();
               _onPurchaseSuccess = null;
             }
-          } else {
-            debugPrint("❌ Invalid purchase detected! Not granting access.");
-            throw "Error with purchase verification. Please contact support.";
           }
-        } else {
-          // Consumable: grant item, no backend verification
-          debugPrint('✅ Consumable purchased: ${purchase.productID}');
-          if (_onPurchaseSuccess != null) {
-            await _onPurchaseSuccess!();
-            _onPurchaseSuccess = null;
-          }
+          _endPurchasing();
+        } else if (purchase.status == PurchaseStatus.error) {
+          debugPrint('Purchase failed: ${purchase.error}');
+          _endPurchasing();
+        } else if (purchase.status == PurchaseStatus.canceled) {
+          debugPrint('Purchase canceled by user: ${purchase.productID}');
+          _endPurchasing();
         }
-        onPurchasingChanged?.call(false);
-      } else if (purchase.status == PurchaseStatus.error) {
-        debugPrint('Purchase failed: ${purchase.error}');
-        onPurchasingChanged?.call(false);
       }
+    } catch (e) {
+      _endPurchasing();
+      rethrow;
     }
+    _endPurchasing();
   }
 
   Future<String?> isUserPro({
@@ -241,6 +378,7 @@ class PurchaseService {
 
   void dispose() {
     _subscription.cancel();
+    _purchaseTimeout?.cancel();
   }
 }
 
@@ -253,7 +391,7 @@ Future<String?> _getBasePlanIfValid(PurchaseDetails purchase) async {
             defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
         'purchaseToken': purchase.verificationData.serverVerificationData,
         'productId': purchase.productID,
-        'packageName': packageInfo?.packageName,
+        'packageName': 'co.za.disnetdev.placeholder',
         'receiptData':
             purchase.verificationData.serverVerificationData, // iOS only
       },
@@ -282,14 +420,14 @@ class PurchasableProduct {
   final String id;
   final String? title;
   final String? subtitle;
-  final ProductType type;
+  final String type;
   ProductDetails? productDetails;
 
   PurchasableProduct copyWith({
     String? id,
     String? title,
     String? subtitle,
-    ProductType? type,
+    String? type,
     ProductDetails? productDetails,
   }) {
     return PurchasableProduct(
@@ -302,26 +440,11 @@ class PurchasableProduct {
   }
 
   factory PurchasableProduct.fromJson(Map<String, dynamic> map) {
-    String? typeInString = map['type'];
-    ProductType? type;
-    if (typeInString != null) {
-      switch (typeInString.toLowerCase()) {
-        case "sub":
-          type = ProductType.sub;
-          break;
-        case "product":
-          type = ProductType.product;
-        default:
-          type = ProductType.product;
-      }
-    }
     return PurchasableProduct(
       id: map['id'] as String,
       title: map['title'] != null ? map['title'] as String : null,
-      type: type ?? ProductType.product,
+      type: map['type'] != null ? map['type'] as String : "product",
       subtitle: map['subtitle'] != null ? map['subtitle'] as String : null,
     );
   }
 }
-
-enum ProductType { sub, product }

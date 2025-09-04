@@ -52,10 +52,12 @@ class _ChooseUserState extends State<ChooseUser> {
   }
 
   init() async {
+    setState(() => loadingUsers = true);
+
     try {
       await PurchaseService().init();
     } catch (e) {
-      snack(context, "Something went wrong getting your purchases: \n$e");
+      snack(context, "Purchase Service Unavailable: \n$e");
     }
 
     try {

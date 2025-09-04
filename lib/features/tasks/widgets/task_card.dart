@@ -270,48 +270,51 @@ class _TaskCardState extends State<TaskCard> {
             ),
           ),
         ),
-        for (Task subTask in subTasks)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
+        // Only render subtasks when the parent is visible and not in undo state
+        if (!markedForDelete && height != 0)
+          for (Task subTask in subTasks)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
 
-            children: [
-              if (height != 0)
-                Icon(
-                  Symbols.subdirectory_arrow_right_rounded,
-                  color: const Color.fromARGB(
-                    255,
-                    255,
-                    255,
-                    255,
-                  ).withAlpha(100),
+              children: [
+                if (height != 0)
+                  Icon(
+                    Symbols.subdirectory_arrow_right_rounded,
+                    color: const Color.fromARGB(
+                      255,
+                      255,
+                      255,
+                      255,
+                    ).withAlpha(100),
+                  ),
+                Expanded(
+                  child: TaskCard(
+                    key: Key(subTask.id),
+                    task: subTask,
+                    onDelete: () async {
+                      try {
+                        await taskCubit.deleteTask(subTask);
+                        setState(() {
+                          subTasks.removeWhere((t) => t.id == subTask.id);
+                        });
+                      } catch (e) {
+                        snack(context, e.toString());
+                      }
+                    },
+                    onDone: () async {
+                      await taskCubit.updateTask(
+                        subTask.copyWith(lastDone: DateTime.now().toString()),
+                      );
+                      subTask = subTask.copyWith(
+                        lastDone: DateTime.now().toString(),
+                      );
+                      taskCubit.incrementScore(task.userId);
+                    },
+                  ),
                 ),
-              Expanded(
-                child: TaskCard(
-                  key: Key(subTask.id),
-                  task: subTask,
-                  onDelete: () async {
-                    try {
-                      await taskCubit.deleteTask(subTask);
-                      setState(() {
-                        subTasks.removeWhere((t) => t.id == subTask.id);
-                      });
-                    } catch (e) {
-                      snack(context, e.toString());
-                    }
-                  },
-                  onDone: () async {
-                    await taskCubit.updateTask(
-                      subTask.copyWith(lastDone: DateTime.now().toString()),
-                    );
-                    subTask = subTask.copyWith(
-                      lastDone: DateTime.now().toString(),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+              ],
+            ),
       ],
     );
   }

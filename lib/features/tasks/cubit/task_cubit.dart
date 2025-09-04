@@ -17,6 +17,14 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
+  Future<void> incrementScore(String phUserId) async {
+    try {
+      await sb.rpc('increment_user_score', params: {'p_user_id': phUserId});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> updateTask(Task task) async {
     try {
       await sb.from("tasks").update(task.toMap()).eq("id", task.id);

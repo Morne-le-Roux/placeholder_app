@@ -203,6 +203,8 @@ class _UserListState extends State<UserList> {
                               }
                             }
 
+                            taskCubit.incrementScore(user.id);
+
                             tasks.removeWhere((t) => t.id == task.id);
                           },
                           onDelete: () async {

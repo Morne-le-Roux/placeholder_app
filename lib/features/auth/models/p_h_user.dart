@@ -9,12 +9,14 @@ class PHUser {
     required this.avatarURL,
     required this.isDashboard,
     required this.accountHolderID,
+    this.score = 0,
   });
   final String id;
   final String name;
   final String? avatarURL;
   final bool isDashboard;
   final String accountHolderID;
+  final int score;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -33,6 +35,7 @@ class PHUser {
       avatarURL: map['avatar_url'] != null ? map['avatar_url'] as String : null,
       isDashboard: map['is_dashboard'] as bool,
       accountHolderID: map['account_holder'] as String,
+      score: map['score'] != null ? map['score'] as int : 0,
     );
   }
 
@@ -42,6 +45,7 @@ class PHUser {
     String? avatarURL,
     bool? isDashboard,
     String? accountHolderId,
+    int? score,
   }) {
     return PHUser(
       id: id ?? this.id,
@@ -49,6 +53,7 @@ class PHUser {
       avatarURL: avatarURL ?? this.avatarURL,
       isDashboard: isDashboard ?? this.isDashboard,
       accountHolderID: accountHolderId ?? accountHolderID,
+      score: score ?? this.score,
     );
   }
 

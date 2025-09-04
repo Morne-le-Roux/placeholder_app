@@ -11,7 +11,6 @@ import 'package:placeholder/features/auth/cubit/auth_cubit.dart';
 import 'package:placeholder/features/auth/views/choose_user.dart';
 import 'package:placeholder/features/auth/views/login.dart';
 import 'package:placeholder/features/release_notes/cubit/release_notes_cubit.dart';
-import 'package:placeholder/services/purchase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toastification/toastification.dart';
 
