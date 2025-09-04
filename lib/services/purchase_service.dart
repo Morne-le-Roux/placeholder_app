@@ -6,10 +6,10 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:placeholder/main.dart';
 
 class PurchaseService {
@@ -20,14 +20,9 @@ class PurchaseService {
   final InAppPurchase _iap = InAppPurchase.instance;
   late StreamSubscription<List<PurchaseDetails>> _subscription;
 
-  String subId = "professional";
+  String subId = "co.za.disnetdev.placeholder.pro";
   String monthlyId = "monthly";
   String annualId = "annual";
-  String advertOneMonthId = "advert_one_month";
-  String advertThreeMonthsId = "advert_three_months";
-  String advertSixMonthsId = "advert_six_months";
-  String advertTwelveMonthsId = "advert_twelve_months";
-  String promoteListingId = "promote_listing";
 
   Duration verificationInterval = Duration(minutes: 5);
 
@@ -85,16 +80,7 @@ class PurchaseService {
   }
 
   Future<void> _loadProducts() async {
-    Set<String> kIds = {
-      subId,
-      advertOneMonthId,
-      advertThreeMonthsId,
-      advertSixMonthsId,
-      advertTwelveMonthsId,
-      promoteListingId,
-      monthlyId,
-      annualId,
-    };
+    Set<String> kIds = {subId, monthlyId, annualId};
     List<GooglePlayProductDetails> subGooglePlayProductDetails = [];
     List<ProductDetails> subAppStoreProductDetails = [];
     List<ProductDetails> normalProducts = [];
@@ -383,6 +369,7 @@ class PurchaseService {
 }
 
 Future<String?> _getBasePlanIfValid(PurchaseDetails purchase) async {
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
   try {
     final res = await sb.functions.invoke(
       'verify_purchase',
@@ -391,7 +378,7 @@ Future<String?> _getBasePlanIfValid(PurchaseDetails purchase) async {
             defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
         'purchaseToken': purchase.verificationData.serverVerificationData,
         'productId': purchase.productID,
-        'packageName': 'co.za.disnetdev.placeholder',
+        'packageName': packageInfo.packageName,
         'receiptData':
             purchase.verificationData.serverVerificationData, // iOS only
       },
@@ -420,14 +407,14 @@ class PurchasableProduct {
   final String id;
   final String? title;
   final String? subtitle;
-  final String type;
+  final ProductType type;
   ProductDetails? productDetails;
 
   PurchasableProduct copyWith({
     String? id,
     String? title,
     String? subtitle,
-    String? type,
+    ProductType? type,
     ProductDetails? productDetails,
   }) {
     return PurchasableProduct(
@@ -440,11 +427,26 @@ class PurchasableProduct {
   }
 
   factory PurchasableProduct.fromJson(Map<String, dynamic> map) {
+    String? typeInString = map['type'];
+    ProductType? type;
+    if (typeInString != null) {
+      switch (typeInString.toLowerCase()) {
+        case "sub":
+          type = ProductType.sub;
+          break;
+        case "product":
+          type = ProductType.product;
+        default:
+          type = ProductType.product;
+      }
+    }
     return PurchasableProduct(
       id: map['id'] as String,
       title: map['title'] != null ? map['title'] as String : null,
-      type: map['type'] != null ? map['type'] as String : "product",
+      type: type ?? ProductType.product,
       subtitle: map['subtitle'] != null ? map['subtitle'] as String : null,
     );
   }
 }
+
+enum ProductType { sub, product }
